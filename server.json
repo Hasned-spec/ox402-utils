@@ -1,0 +1,16 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Hasned-spec/ox402-utils",
+  "description": "45 micro-priced utilities for AI agents: search, screenshots, OCR, whois, geoip, prices. x402 USDC.",
+  "repository": {
+    "url": "https://github.com/Hasned-spec/ox402-utils",
+    "source": "github"
+  },
+  "version": "1.0.0",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://tracy-collar-preview-demands.trycloudflare.com/mcp402/"
+    }
+  ]
+}
