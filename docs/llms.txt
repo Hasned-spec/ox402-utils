@@ -1,11 +1,11 @@
 # ox402
 
 49 micro-priced utilities for AI agents, paid per call via x402 (USDC on Base).
-Base URL: https://experienced-attending-visits-listen.trycloudflare.com
+Base URL: https://owners-pleased-arrange-affiliated.trycloudflare.com
 
 - Free tier: first 5 calls per IP, lifetime. Then HTTP 402 handshake (x402 standard).
-- MCP server: https://experienced-attending-visits-listen.trycloudflare.com/mcp402/ (streamable HTTP)
-- Catalog JSON: https://experienced-attending-visits-listen.trycloudflare.com/x402/
+- MCP server: https://owners-pleased-arrange-affiliated.trycloudflare.com/mcp402/ (streamable HTTP)
+- Catalog JSON: https://owners-pleased-arrange-affiliated.trycloudflare.com/x402/
 
 ## Tools
 
