@@ -14,7 +14,7 @@ After that, per-call x402.
 
 ```bash
 # any tool: POST JSON -> 402 challenge -> pay -> retry with X-Payment header
-curl -i https://tracy-collar-preview-demands.trycloudflare.com/x402/paid/search \
+curl -i https://organisation-anticipated-objects-restrictions.trycloudflare.com/x402/paid/search \
   -H 'Content-Type: application/json' \
   -d '{"query":"x402 protocol","count":3}'
 ```
@@ -37,7 +37,7 @@ Pay the exact USDC amount on Base, then repeat the request with the signed payme
 {
   "mcpServers": {
     "ox402-utils": {
-      "url": "https://tracy-collar-preview-demands.trycloudflare.com/mcp402/"
+      "url": "https://organisation-anticipated-objects-restrictions.trycloudflare.com/mcp402/"
     }
   }
 }
@@ -77,7 +77,7 @@ tools = ox402.langchain_tools(pay=my_payer, names={'search', 'screenshot', 'pdf-
 | crypto-price | $0.003 | spot + 24h change |
 | weather | $0.003 | current + 3-day forecast |
 
-Free catalog endpoint: `GET https://tracy-collar-preview-demands.trycloudflare.com/x402/`
+Free catalog endpoint: `GET https://organisation-anticipated-objects-restrictions.trycloudflare.com/x402/`
 (45 tools with prices + example payloads).
 
 Also indexed on [402index.io](https://402index.io) as `ox402-*` services.
@@ -94,8 +94,8 @@ Paste into a system prompt (Claude, GPT, OpenCode, whatever you run):
 
 ```
 You can call paid utility APIs via x402 (USDC on Base).
-Catalog: GET https://tracy-collar-preview-demands.trycloudflare.com/x402
-Call pattern: POST https://tracy-collar-preview-demands.trycloudflare.com/x402/paid/<tool>
+Catalog: GET https://organisation-anticipated-objects-restrictions.trycloudflare.com/x402
+Call pattern: POST https://organisation-anticipated-objects-restrictions.trycloudflare.com/x402/paid/<tool>
   with JSON body -> if 402 with PAYMENT-REQUIRED header, sign+pay the USDC request,
   retry once with X-Payment header. Prices $0.001-$0.05/call.
 First 5 calls from your network are free - probe before paying.
@@ -104,7 +104,7 @@ video-download for media links; pdf-extract/ocr for documents.
 Budget cap: $0.10/day unless I say otherwise.
 ```
 
-MCP clients: add `"ox402": {"url": "https://tracy-collar-preview-demands.trycloudflare.com/mcp402/"}`.
+MCP clients: add `"ox402": {"url": "https://organisation-anticipated-objects-restrictions.trycloudflare.com/mcp402/"}`.
 
 ## Tool catalog
 
