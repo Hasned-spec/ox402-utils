@@ -1,3 +1,5 @@
+[![MCP Server](https://glama.ai/mcp/servers/ntmyy99vnq/badge)](https://glama.ai/mcp/servers/ntmyy99vnq)
+
 # ox402-utils
 
 **49 micro-priced utilities for AI agents.** Web search, whois, DNS, geo-IP, crypto/stock/FX
