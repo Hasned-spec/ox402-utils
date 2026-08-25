@@ -7,6 +7,9 @@ No accounts, no API keys — every call is authorized by an on-chain micropaymen
 
 ## Use it in 30 seconds (curl)
 
+**Free tier: your first 5 calls every day are free — no wallet needed.** Test reliability,
+then add payment logic when you outgrow it.
+
 ```bash
 # any tool: POST JSON -> 402 challenge -> pay -> retry with X-Payment header
 curl -i https://tracy-collar-preview-demands.trycloudflare.com/x402/paid/search \
