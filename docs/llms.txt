@@ -1,60 +1,52 @@
 # ox402
 
-49 micro-priced utilities for AI agents, paid per call via x402 (USDC on Base).
+40 micro-priced utilities for AI agents, paid per call via x402 (USDC on Base).
 Base URL: https://satisfaction-genetic-lightbox-buying.trycloudflare.com
 
-- Free tier: first 5 calls per IP, lifetime. Then HTTP 402 handshake (x402 standard).
+- Free tier: first 5 calls per IP, lifetime (gen-3d and gen-video excluded - paid only).
+- stt/stt-fast/tts bill per started minute of audio.
 - MCP server: https://satisfaction-genetic-lightbox-buying.trycloudflare.com/mcp402/ (streamable HTTP)
 - Catalog JSON: https://satisfaction-genetic-lightbox-buying.trycloudflare.com/x402/
 
 ## Tools
 
 - kv-get ($0.001) - Read a key from ox402 ephemeral memory (written via kv-put). Returns found/value/ttl_seconds_left. Read-only.
-- kv-put ($0.002) - Store a JSON value in ephemeral shared memory for stateless agents. TTL 1-24h, value <= 8KB, namespaced keys. Mutating.
-- crypto-price ($0.003) - Crypto spot prices + 24h change (CoinGecko ids)
-- fx-rates ($0.003) - Fiat FX rates (ECB daily)
-- weather ($0.003) - Current weather + 3-day forecast by city/coords
-- geoip ($0.004) - IP geolocation: country/city/ISP/proxy/hosting flags
-- stock-quote ($0.004) - Stock quote: last price, prev close, exchange (Yahoo)
-- hash ($0.005) - SHA-256/512/any hash of payload
-- base64 ($0.005) - base64 encode/decode
-- uuid ($0.005) - Generate UUID v4
-- jwt-decode ($0.005) - Decode JWT (no verify)
-- url-encode ($0.005) - URL encode/decode
-- regex-extract ($0.005) - Regex match extraction
-- csv2json ($0.005) - CSV to JSON array
-- json-format ($0.005) - Pretty/minify JSON
-- yaml2json ($0.005) - YAML to JSON
-- timestamp ($0.005) - Unix<->ISO timestamp
-- diff ($0.005) - Unified line diff
-- html2text ($0.005) - Strip HTML to text
-- qrcode ($0.005) - QR code as PNG data-url
-- password ($0.005) - Random password
-- json-merge ($0.005) - Deep-merge two JSON
-- csv-sum ($0.005) - Sum a CSV column
-- unit-convert ($0.005) - Unit convert (len/mass/temp)
-- json2csv ($0.005) - JSON array to CSV
-- schema-validate ($0.005) - Validate JSON vs schema
-- json-pointer ($0.005) - Extract by JSON path
-- csv-col ($0.005) - Extract CSV column
-- text-replace ($0.005) - Find/replace in text
-- sort-json ($0.005) - Sort JSON array by key
-- unique ($0.005) - Unique lines/values
-- wayback ($0.005) - Wayback Machine snapshot + optional history
-- dns-lookup ($0.006) - DNS records: A/AAAA/MX/NS/TXT/CNAME
-- html2md ($0.006) - HTML page/page-url -> clean markdown + links
-- video-info ($0.006) - Video metadata + all formats (YouTube, TikTok, Vimeo, X, SoundCloud, 1000+ sites)
-- search ($0.008) - Web search (DDG): title+url+snippet per result
-- whois ($0.010) - Domain WHOIS: registrar, dates, nameservers, availability
-- text2img ($0.010) - Render text to PNG image (dark/light)
-- pdf-text ($0.010) - Plain text to formatted PDF document
-- screenshot ($0.015) - Headless-chrome screenshot PNG of any URL
-- video-download ($0.015) - Direct download links for a video URL (yt-dlp, 1000+ platforms)
-- web-scrape ($0.020) - Server-side URL scrape (title+text)
-- youtube-info ($0.020) - YouTube metadata + streams
-- base64-url ($0.020) - Fetch URL -> base64 (capped 25MB)
-- ocr ($0.020) - OCR image to text (tesseract, url or base64)
-- pdf-invoice ($0.020) - Generate invoice/receipt PDF (items, tax, logo)
-- pdf-extract ($0.030) - Extract text from PDF
-- image-resize ($0.030) - Resize/convert image
-- youtube-dl ($0.050) - YouTube download (mp3/mp4, capped 25MB)
+- token-count ($0.001) - Exact token counts (tiktoken) for GPT/o-series; honest char-ratio estimates for Claude/Gemini/Llama. Optional cost estimate.
+- stt-fast ($0.002) - Fast local speech-to-text (whisper-tiny): cheap transcript for clear audio. Billed $0.002 per started minute. Less accurate than stt.
+- kv-put ($0.002) - Ephemeral key-value memory for stateless agents: store JSON value, TTL 1-24h, <=8KB. Mutating.
+- embed ($0.002) - Text embeddings (384-dim bge-small, runs locally): semantic search/similarity without managing vector DB keys. Up to 32 texts.
+- crypto-price ($0.004) - Crypto spot prices + 24h change (CoinGecko ids). Read-only.
+- fx-rates ($0.004) - Fiat FX rates (ECB daily reference). Read-only.
+- weather ($0.004) - Current weather + 3-day forecast by city or coords. Read-only.
+- dns-lookup ($0.005) - DNS records A/AAAA/MX/NS/TXT/CNAME for a domain. Read-only.
+- stock-quote ($0.005) - Stock quote: last price, prev close, exchange (Yahoo Finance). Read-only.
+- geoip ($0.005) - IP geolocation: country/city/ISP/proxy/hosting flags. Read-only.
+- temp-webhook ($0.005) - Ephemeral public webhook URL (1h TTL): POST anything to it, then poll the same URL to read payloads. No server needed.
+- qr-code-gen ($0.005) - QR code PNG from any text/url/wifi-config/vcard/payment link, custom colors. Pure CPU, instant.
+- site-down-check ($0.005) - Is it down or just you? Probe from ox402 vantage + independent check-host.net nodes, latency, verdict. Honest about vantage limits.
+- wayback ($0.006) - Wayback Machine: latest snapshot URL + optional snapshot history for a site. Read-only.
+- stt ($0.006) - Speech-to-text via Whisper-large-v3: timestamped transcript from audio URL/base64. Billed $0.006 per started minute (25MB/file cap, <=120min). Premium accuracy.
+- search ($0.008) - Read-only web search (DuckDuckGo): title+url+snippet per result. Cost $0.008/call.
+- html2md ($0.008) - Extracts clean Markdown from any public URL (no raw DOM noise). Read-only.
+- video-info ($0.008) - Video metadata + all stream formats (YouTube/TikTok/Vimeo/X/1000+ sites) via yt-dlp. Read-only.
+- md-compress ($0.008) - Compress scraped/markdown text for prompts: strips base64 blobs, tracking pixels, dup lines, whitespace runs. Typically 30-50% smaller.
+- web-scrape ($0.010) - Server-side URL scrape returning title + readable text. Use when you need plain text fast. Read-only.
+- whois ($0.010) - Domain WHOIS: registrar, creation/expiry dates, nameservers, availability. Read-only.
+- image-edit ($0.010) - Image editor: resize/rotate/crop/grayscale/blur/sharpen/brightness/contrast/flip/border via op list. Input url or base64.
+- image-optimize ($0.010) - Convert heic/png/jpeg -> webp/jpeg/png with compression + optional max_width resize. Reports saved %.
+- link-scan ($0.010) - URL safety scan: full redirect chain, tracking-param strip, urlhaus+openphish feeds, SSL validity, phishing-form heuristic, risk score.
+- repo2context ($0.015) - GitHub repo -> single LLM-ready context file: clones, strips lockfiles/binaries/minified, packs source into markdown. Size-capped.
+- screenshot ($0.020) - Headless-Chromium PNG screenshot of any URL at custom viewport. Returns base64 image.
+- video-download ($0.020) - Direct download links for any video URL (yt-dlp, 1000+ platforms, capped 25MB).
+- exec-python ($0.020) - Isolated Python 3.12 sandbox: run a snippet with {"payload":...,"input":...} globals, capture stdout + result var. CPU/RAM-capped, no network. Mutating only inside sandbox.
+- video2mp3 ($0.020) - Video/audio URL -> clean mono MP3 (48kbps, yt-dlp + ffmpeg, 1000+ platforms). Returns base64. Platform blocks may apply (YouTube/Vimeo need auth).
+- file-scan ($0.020) - Static file analysis (nothing executed): sha256 vs MalwareBazaar, YARA rules, entropy, PDF active-content, PE imports/sections, archive entry listing. <=25MB.
+- extract-structured ($0.030) - Structured Web Data Extractor: fetch a URL, return JSON matching your schema via a fast LLM. Read-only. Cost ~$0.03.
+- pdf-extract ($0.030) - Extracts text from PDF URLs or base64. Agents lack poppler/pdftotext; we run it server-side.
+- ocr ($0.030) - OCR image to text (Tesseract; url or base64 input). Handles screenshots/scans/photos of text.
+- md2pdf ($0.030) - Markdown to styled PDF document (tables/headings supported). Returns base64 PDF. Non-destructive.
+- pdf-invoice ($0.030) - Generate invoice/receipt PDF from line items (seller, buyer, tax). Returns base64 PDF.
+- tts ($0.030) - Text-to-speech WAV (NVIDIA Magpie-Multilingual, natural voices). Billed $0.03 per started minute of generated audio (<=1500 chars/call). Returns base64 WAV.
+- gen-image ($0.060) - FLUX.1-dev text-to-image: photoreal PNG up to 1344px. Returns base64 data-url in ~5-20s. Paid only (no free trial on this tool).
+- gen-3d ($0.150) - Text-to-3D GLB mesh (Microsoft TRELLIS): game-ready asset from one prompt, typically 1-8 min (async, polled server-side). Returns base64 GLB. Paid only - excluded from free trial.
+- gen-video ($0.200) - Text-to-video MP4 (WAN/Cosmos family, ~3-5s clip, minutes latency, async polled server-side). Returns base64 MP4 when ready. $0.20/video, paid only.
