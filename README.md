@@ -1,14 +1,14 @@
 # ox402-utils
 
-**45 micro-priced utilities for AI agents.** Web search, whois, DNS, geo-IP, crypto/stock/FX
+**47 micro-priced utilities for AI agents.** Web search, whois, DNS, geo-IP, crypto/stock/FX
 prices, weather, OCR, screenshots, PDF invoices, scraping, CSV/JSON conversion and more.
 No accounts, no API keys — every call is authorized by an on-chain micropayment
 (**x402**: USDC on Base, $0.003–$0.05 per call).
 
 ## Use it in 30 seconds (curl)
 
-**Free tier: your first 5 calls every day are free — no wallet needed.** Test reliability,
-then add payment logic when you outgrow it.
+**Free tier: your first 5 calls are free — no wallet, no signup.** After that, per-call x402.
+
 
 ```bash
 # any tool: POST JSON -> 402 challenge -> pay -> retry with X-Payment header
@@ -62,6 +62,8 @@ tools = ox402.langchain_tools(pay=my_payer, names={'search', 'screenshot', 'pdf-
 
 | tool | price | what you get |
 |------|------:|--------------|
+| video-info | $0.006 | metadata + all formats for YouTube/TikTok/Vimeo/X/1000+ sites |
+| video-download | $0.015 | direct download links for any video URL |
 | search | $0.008 | web results (title/url/snippet) |
 | screenshot | $0.015 | headless-chrome PNG of any URL |
 | pdf-invoice | $0.02 | invoice/receipt PDF w/ items+tax |
