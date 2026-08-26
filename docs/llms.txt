@@ -1,15 +1,15 @@
 # ox402
 
-59 micro-priced utilities for AI agents, paid per call via x402 (USDC on Base).
-Base URL: https://satisfaction-genetic-lightbox-buying.trycloudflare.com
+58 micro-priced utilities for AI agents, paid per call via x402 (USDC on Base).
+Base URL: https://treating-arcade-overall-enough.trycloudflare.com
 
-- Free tier: first 5 calls per IP, lifetime (gen-3d and gen-video excluded - paid only).
-- stt/stt-fast/tts bill per started minute of audio; free trial caps audio at 5 min/file.
-- MCP server: https://satisfaction-genetic-lightbox-buying.trycloudflare.com/mcp402/ (streamable HTTP)
-- Catalog JSON: https://satisfaction-genetic-lightbox-buying.trycloudflare.com/x402/
+- No free trial: every call settles in USDC via x402 (Standard 402 handshake + X-PAYMENT header).
+- stt/stt-fast/tts bill per started minute of audio; free tier caps audio at 5 min/file.
+- gen-video is paid-only.
+- MCP server: https://treating-arcade-overall-enough.trycloudflare.com/mcp402/ (streamable HTTP)
+- Catalog JSON: https://treating-arcade-overall-enough.trycloudflare.com/x402/
 
 ## Tools
-
 - kv-get ($0.001) - Read a key from ox402 ephemeral memory (written via kv-put). Returns found/value/ttl_seconds_left. Read-only.
 - token-count ($0.001) - Exact token counts (tiktoken) for GPT/o-series; honest char-ratio estimates for Claude/Gemini/Llama. Optional cost estimate.
 - stt-fast ($0.002) - Fast local speech-to-text (whisper-tiny): cheap transcript for clear audio. Billed $0.002 per started minute. Free trial caps at 5 min/file. Less accurate than stt.
@@ -67,5 +67,4 @@ Base URL: https://satisfaction-genetic-lightbox-buying.trycloudflare.com
 - pdf-invoice ($0.030) - Generate invoice/receipt PDF from line items (seller, buyer, tax). Returns base64 PDF.
 - tts ($0.030) - Text-to-speech WAV (NVIDIA Magpie-Multilingual, natural voices). Billed $0.03 per started minute of generated audio (<=1500 chars/call). Returns base64 WAV.
 - gen-image ($0.060) - FLUX.1-dev text-to-image: photoreal PNG up to 1344px. Returns base64 data-url in ~5-20s. Paid only (no free trial on this tool).
-- gen-3d ($0.150) - Text-to-3D GLB mesh (Microsoft TRELLIS): game-ready asset from one prompt, typically 1-8 min (async, polled server-side). Returns base64 GLB. Paid only - excluded from free trial.
 - gen-video ($0.200) - Text-to-video MP4 (WAN/Cosmos family, ~3-5s clip, minutes latency, async polled server-side). Returns base64 MP4 when ready. $0.20/video, paid only.
