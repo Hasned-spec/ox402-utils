@@ -1,13 +1,13 @@
 # ox402
 
 66 micro-priced utilities for AI agents + builders, paid per call via x402 (USDC on Base).
-Base URL: https://treating-arcade-overall-enough.trycloudflare.com
+Base URL: https://satisfaction-genetic-lightbox-buying.trycloudflare.com
 
 - No free trial: every call settles in USDC via x402 (Standard 402 handshake + X-PAYMENT header).
 - Security recon + deep-research packs: header grading, CORS, DNS/email-auth, breach lookups, port + threat intel, multi-query search, citation dossiers, fact-checks.
 - STT via Groq Whisper; TTS offline espeak-ng; everything else CPU-only. No NVIDIA/cloud generative models.
-- MCP server: https://treating-arcade-overall-enough.trycloudflare.com/mcp402/ (streamable HTTP)
-- Catalog JSON: https://treating-arcade-overall-enough.trycloudflare.com/x402/catalog
+- MCP server (streamable HTTP): https://satisfaction-genetic-lightbox-buying.trycloudflare.com/mcp402/
+- Catalog JSON: https://satisfaction-genetic-lightbox-buying.trycloudflare.com/x402/catalog
 
 ## Tools
 
