@@ -1,27 +1,24 @@
 # ox402
 
-73 micro-priced utilities for AI agents, paid per call via x402 (USDC on Base).
+66 micro-priced utilities for AI agents + builders, paid per call via x402 (USDC on Base).
 Base URL: https://treating-arcade-overall-enough.trycloudflare.com
 
 - No free trial: every call settles in USDC via x402 (Standard 402 handshake + X-PAYMENT header).
-- Everything runs on-CPU/offline except STT (Groq Whisper). No NVIDIA/cloud generative models.
-- stt/stt-fast/tts bill per audio; tts is offline espeak-ng (131 voices).
+- Security recon + deep-research packs: header grading, CORS, DNS/email-auth, breach lookups, port + threat intel, multi-query search, citation dossiers, fact-checks.
+- STT via Groq Whisper; TTS offline espeak-ng; everything else CPU-only. No NVIDIA/cloud generative models.
 - MCP server: https://treating-arcade-overall-enough.trycloudflare.com/mcp402/ (streamable HTTP)
 - Catalog JSON: https://treating-arcade-overall-enough.trycloudflare.com/x402/catalog
 
 ## Tools
 
 - tts-voices ($0.000) - List available offline espeak-ng voice codes (en-us, en-gb, es, fr, de, it, ja, zh, ...). Free reference call.
-- kv-get ($0.001) - Read a key from ox402 ephemeral memory (written via kv-put). Returns found/value/ttl_seconds_left. Read-only.
-- token-count ($0.001) - Exact token counts (tiktoken) for GPT/o-series; honest char-ratio estimates for Claude/Gemini/Llama. Optional cost estimate.
+- uuid ($0.001) - Generate 1-1000 v4 UUIDs.
 - epoch ($0.001) - Unix<->ISO8601 convert; no arg returns now.
-- slugify ($0.001) - URL-safe slug from arbitrary text.
 - stt-fast ($0.002) - Fast local speech-to-text (whisper-tiny): cheap transcript for clear audio. Billed $0.002 per started minute. Free trial caps at 5 min/file. Less accurate than stt.
 - tts ($0.002) - Tiny offline text-to-speech via espeak-ng: WAV in 30+ languages, no API key, no GPU. Billed $0.002 per 1k chars (<=1500 chars/call). Returns base64 WAV. Voice codes via tts-voices.
-- kv-put ($0.002) - Ephemeral key-value memory for stateless agents: store JSON value, TTL 1-24h, <=8KB. Mutating.
-- embed ($0.002) - Text embeddings (384-dim bge-small, runs locally): semantic search/similarity without managing vector DB keys. Up to 32 texts.
 - json-validate ($0.002) - Lint + structurally validate JSON (object vs array, key count).
-- color-convert ($0.002) - Convert hex<->rgb<->hsl.
+- hash ($0.002) - md5/sha1/sha256/sha512 of text, base64, or URL (<=25MB).
+- unit-convert ($0.002) - Convert length/weight/data/volume/time units.
 - regex-test ($0.003) - Test a regex against text: matches or replace preview.
 - ua-parse ($0.003) - Parse a User-Agent into browser/OS/device + bot flag.
 - password ($0.003) - Cryptographically random passphrase or password (secrets module).
@@ -40,45 +37,41 @@ Base URL: https://treating-arcade-overall-enough.trycloudflare.com
 - temp-webhook ($0.005) - Ephemeral public webhook URL (1h TTL): POST anything to it, then poll the same URL to read payloads. No server needed.
 - qr-code-gen ($0.005) - QR code PNG from any text/url/wifi-config/vcard/payment link, custom colors. Pure CPU, instant.
 - site-down-check ($0.005) - Is it down or just you? Probe from ox402 vantage + independent check-host.net nodes, latency, verdict. Honest about vantage limits.
-- hash ($0.005) - Hash text with sha256/sha1/md5/any hashlib algo. Deterministic digests.
-- uuid ($0.005) - Generate random UUID v4. One per call.
-- unit-convert ($0.005) - Convert length/mass units (m/ft/km/mi/kg/lb/g/oz...). Simple physical units.
 - robots ($0.005) - Fetch robots.txt and return structured allow/disallow rules.
-- base64 ($0.005) - Base64 encode/decode of text (mode=decode for the reverse). Instant.
-- csv2json ($0.005) - Convert CSV text to JSON array of row objects. Handles quoted fields via csv module.
-- json2csv ($0.005) - Convert JSON array of flat objects to CSV text. Column union across rows.
-- csv-col ($0.005) - Extract one column from CSV text as a list. Fast column slice.
-- csv-sum ($0.005) - Sum a numeric column across CSV rows. Non-numeric treated as 0.
-- sort-json ($0.005) - Sort a JSON array of objects by key (asc/desc).
-- unique ($0.005) - Deduplicate lines or list items, preserving first-seen order. Returns count too.
-- regex-extract ($0.005) - Extract all regex matches from text. Quick pattern pulls without writing code.
 - jwt-decode ($0.005) - Decode JWT header+payload (no signature verification). Debug tokens safely.
-- timestamp ($0.005) - Unix epoch <-> ISO8601 conversion, both directions, auto-detected.
-- diff ($0.005) - Unified diff of two texts (a vs b). Line-level changes at a glance.
 - json-format ($0.005) - Pretty-print/minify JSON with chosen indent. Validate + format in one call.
 - json-merge ($0.005) - Deep-merge two JSON objects (b wins on conflicts). Config layering.
-- qrcode ($0.005) - QR code PNG from any text/url, returned as data-url. Scan-ready instantly.
 - wayback ($0.006) - Wayback Machine: latest snapshot URL + optional snapshot history for a site. Read-only.
 - stt ($0.006) - Speech-to-text via Whisper-large-v3: timestamped transcript from audio URL/base64. Billed $0.006 per started minute. Free trial caps at 5 min/file; paid allows 25MB/file up to 120 min. Premium accuracy.
 - ssl-check ($0.006) - TLS certificate validity, expiry (days), issuer, SANs for a host:443. Read-only.
 - sitemap ($0.006) - Fetch + parse a sitemap.xml, list URLs (and nested maps).
+- cookie-flags ($0.006) - Parse Set-Cookie for Secure/HttpOnly/SameSite flags; list insecure or JS-readable cookies.
 - search ($0.008) - Read-only web search (DuckDuckGo): title+url+snippet per result. Cost $0.008/call.
 - html2md ($0.008) - Extracts clean Markdown from any public URL (no raw DOM noise). Read-only.
 - video-info ($0.008) - Video metadata + all stream formats (YouTube/TikTok/Vimeo/X/1000+ sites) via yt-dlp. Read-only.
 - md-compress ($0.008) - Compress scraped/markdown text for prompts: strips base64 blobs, tracking pixels, dup lines, whitespace runs. Typically 30-50% smaller.
+- cors-check ($0.008) - Probe a URL CORS policy from a fake origin: detect wildcard/credentialed cross-origin holes.
+- dns-recon ($0.008) - Full DNS recon: A/AAAA/MX/NS/TXT/CNAME/SOA + SPF/DKIM/DMARC email-auth presence.
 - web-scrape ($0.010) - Server-side URL scrape returning title + readable text. Use when you need plain text fast. Read-only.
 - whois ($0.010) - Domain WHOIS: registrar, creation/expiry dates, nameservers, availability. Read-only.
 - image-edit ($0.010) - Image editor: resize/rotate/crop/grayscale/blur/sharpen/brightness/contrast/flip/border via op list. Input url or base64.
 - image-optimize ($0.010) - Convert heic/png/jpeg -> webp/jpeg/png with compression + optional max_width resize. Reports saved %.
 - link-scan ($0.010) - URL safety scan: full redirect chain, tracking-param strip, urlhaus+openphish feeds, SSL validity, phishing-form heuristic, risk score.
-- text2img ($0.010) - Render text to PNG image (PIL): custom width/font size, dark or light theme. No diffusion.
+- security-headers ($0.010) - Grade a sites HTTP security headers (HSTS/CSP/X-Frame-Options/XXP/Referrer-Policy/Permissions-Policy). A-D grade.
+- port-scan ($0.010) - TCP connect scan of common ports (honest: one datacenter vantage, not stealth).
+- leak-check ($0.010) - Email against HaveIBeenPwned k-anonymity range API: breached? how many times?
+- subdomain-find ($0.010) - Passive subdomain discovery via crt.sh certificate transparency (no probing).
+- threat-intel ($0.010) - IP reputation: DNSBL blacklist hits + proxy/VPN/Tor + geo (ipwho.is). Verdict clean/suspicious.
+- trend-watch ($0.010) - Recent signal volume on a keyword across news/social slices. Early-trend radar.
+- deep-search ($0.012) - Multi-query fan-out search: dedupe + rank results across 5 queries. Agent-grade discovery.
+- fact-check ($0.012) - Claim -> search corroborating/contradicting sources, return verdict (corroborated/contradicted/mixed).
 - repo2context ($0.015) - GitHub repo -> single LLM-ready context file: clones, strips lockfiles/binaries/minified, packs source into markdown. Size-capped.
-- screenshot ($0.020) - Headless-Chromium PNG screenshot of any URL at custom viewport. Returns base64 image.
+- citations ($0.015) - Fetch N URLs, return canonical BibTeX cites + cleaned text (RAG-ready corpus).
 - video-download ($0.020) - Direct download links for any video URL (yt-dlp, 1000+ platforms, capped 25MB).
 - exec-python ($0.020) - Isolated Python 3.12 sandbox: run a snippet with {"payload":...,"input":...} globals, capture stdout + result var. CPU/RAM-capped, no network. Mutating only inside sandbox.
 - video2mp3 ($0.020) - Video/audio URL -> clean mono MP3 (48kbps, yt-dlp + ffmpeg, 1000+ platforms). Returns base64. Platform blocks may apply (YouTube/Vimeo need auth).
 - file-scan ($0.020) - Static file analysis (nothing executed): sha256 vs MalwareBazaar, YARA rules, entropy, PDF active-content, PE imports/sections, archive entry listing. <=25MB.
-- base64-url ($0.020) - Fetch a file from a URL (<=25MB) and return it as base64 data-url. Read-only.
+- research-brief ($0.020) - Topic -> search + fetch top sources -> markdown dossier with citations. Research on autopilot.
 - extract-structured ($0.030) - Structured Web Data Extractor: fetch a URL, return JSON matching your schema via a fast LLM. Read-only. Cost ~$0.03.
 - pdf-extract ($0.030) - Extracts text from PDF URLs or base64. Agents lack poppler/pdftotext; we run it server-side.
 - ocr ($0.030) - OCR image to text (Tesseract; url or base64 input). Handles screenshots/scans/photos of text.
