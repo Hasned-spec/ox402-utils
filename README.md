@@ -4,7 +4,7 @@
 Web research, security recon, **neural text-to-speech (Kokoro-82M)**, speech, document + media
 conversion, full-page screenshots, and SSL/breach audits. No accounts, no API keys, no subscription.
 
-> Live site: **https://satisfaction-genetic-lightbox-buying.trycloudflare.com**
+> Live site: **the current tunnel URL is published in `api.txt` and `/.well-known/x402` on this repo's served docs, and rotates periodically — fetch `api.txt` for the live endpoint.**
 > MCP server: **`/mcp402/`** · Catalog: **`/x402/catalog`** · Machine-readable: **`/llms.txt`**
 
 ---
@@ -24,7 +24,7 @@ service abuse-free.
 
 ```bash
 # Any tool: POST JSON -> 402 challenge -> pay -> retry with X-Payment header
-curl -i https://satisfaction-genetic-lightbox-buying.trycloudflare.com/x402/paid/search \
+curl -i $(curl -s https://raw.githubusercontent.com/Hasned-spec/ox402-utils/main/docs/api.txt)/x402/paid/search \
   -H 'Content-Type: application/json' \
   -d '{"query":"x402 protocol","count":3}'
 ```
@@ -39,7 +39,7 @@ Verified via the CDP facilitator; settled on-chain.
 ```json
 {
   "mcpServers": {
-    "ox402-utils": { "url": "https://satisfaction-genetic-lightbox-buying.trycloudflare.com/mcp402/" }
+    "ox402-utils": { "url": "$(curl -s https://raw.githubusercontent.com/Hasned-spec/ox402-utils/main/docs/api.txt)/mcp402/" }
   }
 }
 ```
