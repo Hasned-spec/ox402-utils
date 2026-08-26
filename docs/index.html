@@ -147,7 +147,7 @@ footer a{color:#55503f}
     </div>
     <div class="cta">
       <span class="cta-label">First call is <b>$0.004</b> — try it:</span>
-      <code id="cta-cmd">x402 curl https://satisfaction-genetic-lightbox-buying.trycloudflare.com/x402/paid/crypto-price -H 'Content-Type: application/json' -d '{"ids":"bitcoin,ethereum"}'</code>
+      <code id="cta-cmd">x402 curl https://HOST/x402/paid/crypto-price -H 'Content-Type: application/json' -d '{"ids":"bitcoin,ethereum"}'</code>
       <button class="ghost" id="cta-copy">Copy</button>
     </div>
   </div>
@@ -220,7 +220,7 @@ npm i -g x402
 export X402_PRIVATE_KEY=0x...
 
 <span class="c"># 3. call any tool — payment happens automatically</span>
-x402 curl https://satisfaction-genetic-lightbox-buying.trycloudflare.com/x402/paid/crypto-price \
+x402 curl https://HOST/x402/paid/crypto-price \
   -H 'Content-Type: application/json' -d '{"ids":"bitcoin,ethereum"}'</pre>
     <p class="desc" style="margin-top:6px">Or in Python: <span class="mono">pip install x402</span> then <span class="mono">from x402 import x402_fetch</span>. The MCP server (below) is the easiest path for agents.</p>
   </section>
@@ -233,7 +233,7 @@ x402 curl https://satisfaction-genetic-lightbox-buying.trycloudflare.com/x402/pa
     <pre>{
   "mcpServers": {
     "ox402-utils": {
-      "url": "https://satisfaction-genetic-lightbox-buying.trycloudflare.com/mcp402/"
+      "url": "https://HOST/mcp402/"
     }
   }
 }</pre>
@@ -284,6 +284,12 @@ function isNeural(id){ return id==='tts'; }
 
 async function load(){
   const live = document.getElementById('live');
+  // rewrite HOST placeholders with the real current host (tunnel rotates)
+  document.querySelectorAll('code, pre').forEach(el => {
+    if(el.textContent.includes('HOST')) el.textContent = el.textContent.replace(/https:\/\/HOST/g, 'https://' + location.host);
+  });
+  const cta = document.getElementById('cta-cmd');
+  if(cta && cta.textContent.includes('HOST')) cta.textContent = cta.textContent.replace(/https:\/\/HOST/g, 'https://' + location.host);
   try {
     const d = await (await fetch('/x402/catalog')).json();
     TOOLS = d.tools || {};
