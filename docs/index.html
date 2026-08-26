@@ -30,6 +30,9 @@ nav a{color:#55503f;border-bottom:none}
 nav a:hover{color:#14161a}
 .spacer{flex:1}
 .hcta{font-size:13px;color:#55503f;border-bottom:none}
+.live{font:600 12px/1 "Helvetica Neue",Helvetica,Arial,sans-serif;color:#1f7a52;display:flex;align-items:center;gap:5px}
+.live:before{content:"";width:7px;height:7px;border-radius:50%;background:#2fa968;box-shadow:0 0 0 3px rgba(47,169,104,.18)}
+.live.down{color:#a9442f}.live.down:before{background:#c0492f;box-shadow:0 0 0 3px rgba(192,73,47,.18)}
 @media(max-width:640px){nav{display:none}}
 
 /* intro */
@@ -63,6 +66,7 @@ input[type=search]:focus{border-color:#1f5f5b}
 .card{border:1px solid #e6e2d7;border-radius:8px;background:#fff;padding:13px 14px;display:flex;flex-direction:column;gap:6px;transition:border-color .12s,box-shadow .12s}
 .card:hover{border-color:#b9b3a3;box-shadow:0 2px 10px rgba(20,20,20,.05)}
 .card .top{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.card{cursor:pointer}
 .card .name{font:700 14px/1.2 "Helvetica Neue",Helvetica,Arial,sans-serif;color:#14161a}
 .card .price{font:600 13px/1 ui-monospace,Menlo,monospace;color:#1f5f5b;white-space:nowrap}
 .card .desc{font-size:12.8px;color:#5d5949;flex:1}
@@ -113,11 +117,13 @@ footer a{color:#55503f}
     <a class="logo" href="/">ox402<span>&nbsp;/ utils</span></a>
     <nav>
       <a href="#tools">Tools</a>
-      <a href="#quickstart">Quickstart</a>
       <a href="#playground">Try it</a>
+      <a href="#forhumans">Command line</a>
+      <a href="#mcp">Agents (MCP)</a>
       <a href="#limits">Limits</a>
     </nav>
     <span class="spacer"></span>
+    <span class="live" id="live">● live</span>
     <a class="hcta mono" href="/x402/catalog">catalog.json →</a>
   </div>
 </header>
@@ -173,14 +179,17 @@ curl -s https://&lt;tunnel&gt;/x402/paid/crypto-price \
   <hr>
 
   <section id="playground">
-    <h2>Try one right now</h2>
-    <p class="desc">Pick a tool, edit the JSON body, hit run. If your wallet hasn't paid yet, it returns a 402 — paste the
-       <span class="mono">X-PAYMENT</span> header and retry.</p>
+    <h2>Try a tool</h2>
+    <p class="desc">Two ways to use it:
+      <b>Agents</b> — add the MCP server to Claude/Cursor (one line, below) and just ask.
+      <b>Humans / scripts</b> — copy the curl, install any x402 client, run it. Every call is paid in USDC on Base.
+      The button below simulates an agent call: if no payment is attached it returns a friendly <span class="mono">402</span> with the exact command to copy.</p>
     <div class="play">
       <div class="controls">
         <select id="tool"><option value="">loading…</option></select>
-        <button id="run">Run</button>
+        <button id="run">Run (agent-style)</button>
         <button class="ghost" id="reset">Reset body</button>
+        <button class="ghost" id="copycurl">Copy curl</button>
         <span class="hint" id="price"></span>
       </div>
       <textarea id="req" spellcheck="false"></textarea>
@@ -189,6 +198,37 @@ curl -s https://&lt;tunnel&gt;/x402/paid/crypto-price \
         <div class="out-body mono" id="outbody"></div>
       </div>
     </div>
+  </section>
+
+  <hr>
+
+  <section id="forhumans">
+    <h2>Pay from the command line (humans)</h2>
+    <p class="desc">No wallet UI needed. Use the official x402 fetch client — it handles the 402 → pay → retry automatically.</p>
+    <pre><span class="c"># 1. install a client (one time)</span>
+npm i -g x402
+
+<span class="c"># 2. set your Base USDC payer (any x402-compatible wallet)</span>
+export X402_PRIVATE_KEY=0x...
+
+<span class="c"># 3. call any tool — payment happens automatically</span>
+x402 curl https://satisfaction-genetic-lightbox-buying.trycloudflare.com/x402/paid/crypto-price \
+  -H 'Content-Type: application/json' -d '{"ids":"bitcoin,ethereum"}'</pre>
+    <p class="desc" style="margin-top:6px">Or in Python: <span class="mono">pip install x402</span> then <span class="mono">from x402 import x402_fetch</span>. The MCP server (below) is the easiest path for agents.</p>
+  </section>
+
+  <hr>
+
+  <section id="mcp">
+    <h2>Use it from any AI agent (MCP)</h2>
+    <p class="desc">Add this to your agent's MCP config. The agent sees all 57 tools, and pays per call automatically — no keys, no signup.</p>
+    <pre>{
+  "mcpServers": {
+    "ox402-utils": {
+      "url": "https://satisfaction-genetic-lightbox-buying.trycloudflare.com/mcp402/"
+    }
+  }
+}</pre>
   </section>
 
   <hr>
@@ -235,6 +275,7 @@ function perMin(id){ return id==='stt'||id==='stt-fast'||id==='video2mp3'||id===
 function isNeural(id){ return id==='tts'; }
 
 async function load(){
+  const live = document.getElementById('live');
   try {
     const d = await (await fetch('/x402/catalog')).json();
     TOOLS = d.tools || {};
@@ -244,8 +285,15 @@ async function load(){
     renderChips();
     renderGrid();
     renderSelect();
+    // reflect live health
+    try {
+      const h = await fetch('/x402/health');
+      if(h.ok){ live.textContent='● live'; live.className='live'; }
+      else { live.textContent='● degraded'; live.className='live down'; }
+    } catch(e){ live.textContent='● offline'; live.className='live down'; }
   } catch(e){
     document.getElementById('subline').textContent = 'Catalog temporarily unreachable — endpoints still up.';
+    live.textContent='● status unknown'; live.className='live down';
   }
 }
 
@@ -277,12 +325,16 @@ function renderGrid(filt=''){
       if(isNeural(id)) badges += '<span class="badge neural">neural</span>';
       if(t.tier === 'paid') badges += '<span class="badge paid">paid</span>';
       const priceTxt = perMin(id) ? fmt(t.price).replace(/$/,'').replace(/0+$/,'').replace(/\.$/,'') + '/min*' : fmt(t.price);
-      html += `<div class="card"><div class="top"><span class="name">${id}</span><span class="price">${priceTxt}</span></div>` +
+      html += `<div class="card" data-id="${id}" role="button" tabindex="0" title="click to try ${id}"><div class="top"><span class="name">${id}</span><span class="price">${priceTxt}</span></div>` +
               `<div class="desc">${(t.desc||'').replace(/^Cost ~?\$[\d.]+ ?(\/call)?\.? ?/i,'')}</div>` +
               (badges ? `<div class="badges">${badges}</div>` : '') + `</div>`;
     }
   }
   grid.innerHTML = html || '<div class="empty">no match</div>';
+  grid.querySelectorAll('.card[data-id]').forEach(c => {
+    c.onclick = () => { document.getElementById('tool').value = c.dataset.id; syncBody(); document.getElementById('playground').scrollIntoView({behavior:'smooth'}); };
+    c.onkeydown = e => { if(e.key==='Enter'){ c.click(); } };
+  });
 }
 
 function renderSelect(){
@@ -309,6 +361,21 @@ function renderResult(d, status){
   document.getElementById('meta').textContent = d.payer ? `paid by ${String(d.payer).slice(0,10)}…` : '';
   const res = d.result !== undefined ? d.result : d;
   ob.innerHTML = '';
+  // Friendly 402: tell humans exactly how to pay, with a copyable curl.
+  if(status === '402'){
+    const tool = document.getElementById('tool').value;
+    const curl = `x402 curl https://${location.host}/x402/paid/${tool} \\\n  -H 'Content-Type: application/json' -d '${document.getElementById('req').value.replace(/'/g,"\\'")}'`;
+    const box = document.createElement('div');
+    box.innerHTML = `<p style="margin:0 0 8px"><b>This tool needs an x402 payment.</b> No wallet was attached, so nothing was charged. To actually run it:</p>` +
+      `<p style="margin:0 0 6px;font-size:12px;color:#5d5949">Install a client once: <code style="background:#eee;padding:1px 5px;border-radius:3px">npm i -g x402</code>, set <code style="background:#eee;padding:1px 5px;border-radius:3px">X402_PRIVATE_KEY</code>, then:</p>`;
+    const pre = document.createElement('pre'); pre.style.margin='0'; pre.textContent = curl;
+    box.appendChild(pre);
+    const cp = document.createElement('button'); cp.textContent='Copy this command'; cp.className='ghost'; cp.style.marginTop='8px';
+    cp.onclick = () => { navigator.clipboard.writeText(curl.replace(/\\\n\s*/g,' ')); cp.textContent='Copied ✓'; };
+    box.appendChild(cp);
+    ob.appendChild(box);
+    out.hidden = false; return;
+  }
   const pick = (k) => res && res[k];
   if(pick('data_url')){
     const du = String(res.data_url);
@@ -324,6 +391,13 @@ function renderResult(d, status){
   ob.appendChild(pre);
   out.hidden = false;
 }
+
+document.getElementById('copycurl').onclick = () => {
+  const tool = document.getElementById('tool').value;
+  const curl = `x402 curl https://${location.host}/x402/paid/${tool} -H 'Content-Type: application/json' -d '${document.getElementById('req').value.replace(/'/g,"\\'")}'`;
+  navigator.clipboard.writeText(curl);
+  const b = document.getElementById('copycurl'); b.textContent='Copied ✓'; setTimeout(()=>b.textContent='Copy curl',1500);
+};
 
 document.getElementById('run').onclick = async () => {
   const btn = document.getElementById('run');
