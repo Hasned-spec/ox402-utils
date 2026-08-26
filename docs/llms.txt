@@ -1,24 +1,22 @@
 # ox402
 
-66 micro-priced utilities for AI agents + builders, paid per call via x402 (USDC on Base).
+63 micro-priced utilities for AI agents + builders, paid per call via x402 (USDC on Base).
 Base URL: https://satisfaction-genetic-lightbox-buying.trycloudflare.com
 
 - No free trial: every call settles in USDC via x402 (Standard 402 handshake + X-PAYMENT header).
 - Security recon + deep-research packs: header grading, CORS, DNS/email-auth, breach lookups, port + threat intel, multi-query search, citation dossiers, fact-checks.
 - STT via Groq Whisper; TTS offline espeak-ng; everything else CPU-only. No NVIDIA/cloud generative models.
-- MCP server (streamable HTTP): https://satisfaction-genetic-lightbox-buying.trycloudflare.com/mcp402/
+- MCP server (streamable HTTP): https://satisfaction-genetic-lightbox-buying.trycloudflare.com/mcp402/  (compact tool list ~1.7k tokens; verbose schemas on demand)
 - Catalog JSON: https://satisfaction-genetic-lightbox-buying.trycloudflare.com/x402/catalog
 
 ## Tools
 
 - tts-voices ($0.000) - List available offline espeak-ng voice codes (en-us, en-gb, es, fr, de, it, ja, zh, ...). Free reference call.
-- uuid ($0.001) - Generate 1-1000 v4 UUIDs.
-- epoch ($0.001) - Unix<->ISO8601 convert; no arg returns now.
+- epoch ($0.001) - Unix<->ISO8601 convert; no arg returns now. Lightweight.
 - stt-fast ($0.002) - Fast local speech-to-text (whisper-tiny): cheap transcript for clear audio. Billed $0.002 per started minute. Free trial caps at 5 min/file. Less accurate than stt.
 - tts ($0.002) - Tiny offline text-to-speech via espeak-ng: WAV in 30+ languages, no API key, no GPU. Billed $0.002 per 1k chars (<=1500 chars/call). Returns base64 WAV. Voice codes via tts-voices.
 - json-validate ($0.002) - Lint + structurally validate JSON (object vs array, key count).
 - hash ($0.002) - md5/sha1/sha256/sha512 of text, base64, or URL (<=25MB).
-- unit-convert ($0.002) - Convert length/weight/data/volume/time units.
 - regex-test ($0.003) - Test a regex against text: matches or replace preview.
 - ua-parse ($0.003) - Parse a User-Agent into browser/OS/device + bot flag.
 - password ($0.003) - Cryptographically random passphrase or password (secrets module).
@@ -36,12 +34,8 @@ Base URL: https://satisfaction-genetic-lightbox-buying.trycloudflare.com
 - geoip ($0.005) - IP geolocation: country/city/ISP/proxy/hosting flags. Read-only.
 - temp-webhook ($0.005) - Ephemeral public webhook URL (1h TTL): POST anything to it, then poll the same URL to read payloads. No server needed.
 - qr-code-gen ($0.005) - QR code PNG from any text/url/wifi-config/vcard/payment link, custom colors. Pure CPU, instant.
-- site-down-check ($0.005) - Is it down or just you? Probe from ox402 vantage + independent check-host.net nodes, latency, verdict. Honest about vantage limits.
 - robots ($0.005) - Fetch robots.txt and return structured allow/disallow rules.
 - jwt-decode ($0.005) - Decode JWT header+payload (no signature verification). Debug tokens safely.
-- json-format ($0.005) - Pretty-print/minify JSON with chosen indent. Validate + format in one call.
-- json-merge ($0.005) - Deep-merge two JSON objects (b wins on conflicts). Config layering.
-- wayback ($0.006) - Wayback Machine: latest snapshot URL + optional snapshot history for a site. Read-only.
 - stt ($0.006) - Speech-to-text via Whisper-large-v3: timestamped transcript from audio URL/base64. Billed $0.006 per started minute. Free trial caps at 5 min/file; paid allows 25MB/file up to 120 min. Premium accuracy.
 - ssl-check ($0.006) - TLS certificate validity, expiry (days), issuer, SANs for a host:443. Read-only.
 - sitemap ($0.006) - Fetch + parse a sitemap.xml, list URLs (and nested maps).
@@ -77,3 +71,6 @@ Base URL: https://satisfaction-genetic-lightbox-buying.trycloudflare.com
 - ocr ($0.030) - OCR image to text (Tesseract; url or base64 input). Handles screenshots/scans/photos of text.
 - md2pdf ($0.030) - Markdown to styled PDF document (tables/headings supported). Returns base64 PDF. Non-destructive.
 - pdf-invoice ($0.030) - Generate invoice/receipt PDF from line items (seller, buyer, tax). Returns base64 PDF.
+- strip-metadata ($0.100) - Privacy scrubber: removes EXIF/GPS/comments from images and metadata from PDFs. One call before you post or share.
+- capture-page ($0.150) - Full-page screenshot and/or PDF of any URL via headless Chromium. Developers, agents, and users needing clean captures + PDF receipts without running a browser. Returns base64.
+- site-report ($0.250) - One-call website security + SSL audit: cert expiry/issuer, missing security headers, load speed. For site owners + devs.
