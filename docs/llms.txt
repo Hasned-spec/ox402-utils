@@ -1,45 +1,34 @@
 # ox402
 
-63 micro-priced utilities for AI agents + builders, paid per call via x402 (USDC on Base).
+56 capability APIs an AI agent can't run in its own sandbox, paid per call via x402 (USDC on Base).
 Base URL: https://satisfaction-genetic-lightbox-buying.trycloudflare.com
 
 - No free trial: every call settles in USDC via x402 (Standard 402 handshake + X-PAYMENT header).
-- Security recon + deep-research packs: header grading, CORS, DNS/email-auth, breach lookups, port + threat intel, multi-query search, citation dossiers, fact-checks.
-- STT via Groq Whisper; TTS offline espeak-ng; everything else CPU-only. No NVIDIA/cloud generative models.
-- MCP server (streamable HTTP): https://satisfaction-genetic-lightbox-buying.trycloudflare.com/mcp402/  (compact tool list ~1.7k tokens; verbose schemas on demand)
+- What's here: web research, security recon (headers/CORS/DNS/email-auth/breach/port/threat), speech (STT/TTS),
+  document + media conversion, screenshots/PDF capture, privacy scrubbing, SSL audits, deep-research.
+- MCP server (streamable HTTP): https://satisfaction-genetic-lightbox-buying.trycloudflare.com/mcp402/  (compact tool list ~1.5k tokens; verbose schemas on demand)
 - Catalog JSON: https://satisfaction-genetic-lightbox-buying.trycloudflare.com/x402/catalog
 
 ## Tools
 
 - tts-voices ($0.000) - List available offline espeak-ng voice codes (en-us, en-gb, es, fr, de, it, ja, zh, ...). Free reference call.
-- epoch ($0.001) - Unix<->ISO8601 convert; no arg returns now. Lightweight.
 - stt-fast ($0.002) - Fast local speech-to-text (whisper-tiny): cheap transcript for clear audio. Billed $0.002 per started minute. Free trial caps at 5 min/file. Less accurate than stt.
 - tts ($0.002) - Tiny offline text-to-speech via espeak-ng: WAV in 30+ languages, no API key, no GPU. Billed $0.002 per 1k chars (<=1500 chars/call). Returns base64 WAV. Voice codes via tts-voices.
-- json-validate ($0.002) - Lint + structurally validate JSON (object vs array, key count).
-- hash ($0.002) - md5/sha1/sha256/sha512 of text, base64, or URL (<=25MB).
-- regex-test ($0.003) - Test a regex against text: matches or replace preview.
-- ua-parse ($0.003) - Parse a User-Agent into browser/OS/device + bot flag.
-- password ($0.003) - Cryptographically random passphrase or password (secrets module).
 - crypto-price ($0.004) - Crypto spot prices + 24h change (CoinGecko ids). Read-only.
 - fx-rates ($0.004) - Fiat FX rates (ECB daily reference). Read-only.
 - weather ($0.004) - Current weather + 3-day forecast by city or coords. Read-only.
 - http-headers ($0.004) - HTTP response status + full headers for a URL. Read-only.
-- csv-to-json ($0.004) - Parse CSV text into JSON rows with column names.
-- json-to-csv ($0.004) - Flatten a JSON array of objects into CSV.
-- yaml-to-json ($0.004) - Convert YAML to JSON (safe_load).
-- jsonpath ($0.004) - Extract nodes from JSON via JSONPath expression.
-- text-diff ($0.004) - Unified line diff between two texts (added/removed counts).
 - dns-lookup ($0.005) - DNS records A/AAAA/MX/NS/TXT/CNAME for a domain. Read-only.
 - stock-quote ($0.005) - Stock quote: last price, prev close, exchange (Yahoo Finance). Read-only.
 - geoip ($0.005) - IP geolocation: country/city/ISP/proxy/hosting flags. Read-only.
 - temp-webhook ($0.005) - Ephemeral public webhook URL (1h TTL): POST anything to it, then poll the same URL to read payloads. No server needed.
-- qr-code-gen ($0.005) - QR code PNG from any text/url/wifi-config/vcard/payment link, custom colors. Pure CPU, instant.
 - robots ($0.005) - Fetch robots.txt and return structured allow/disallow rules.
-- jwt-decode ($0.005) - Decode JWT header+payload (no signature verification). Debug tokens safely.
 - stt ($0.006) - Speech-to-text via Whisper-large-v3: timestamped transcript from audio URL/base64. Billed $0.006 per started minute. Free trial caps at 5 min/file; paid allows 25MB/file up to 120 min. Premium accuracy.
 - ssl-check ($0.006) - TLS certificate validity, expiry (days), issuer, SANs for a host:443. Read-only.
 - sitemap ($0.006) - Fetch + parse a sitemap.xml, list URLs (and nested maps).
 - cookie-flags ($0.006) - Parse Set-Cookie for Secure/HttpOnly/SameSite flags; list insecure or JS-readable cookies.
+- reverse-dns ($0.006) - Reverse DNS: IP -> PTR hostname. Confirms what a server calls itself.
+- web-archive ($0.006) - Fetch the latest Wayback Machine snapshot for any URL. Recover changed/dead pages.
 - search ($0.008) - Read-only web search (DuckDuckGo): title+url+snippet per result. Cost $0.008/call.
 - html2md ($0.008) - Extracts clean Markdown from any public URL (no raw DOM noise). Read-only.
 - video-info ($0.008) - Video metadata + all stream formats (YouTube/TikTok/Vimeo/X/1000+ sites) via yt-dlp. Read-only.
@@ -48,7 +37,6 @@ Base URL: https://satisfaction-genetic-lightbox-buying.trycloudflare.com
 - dns-recon ($0.008) - Full DNS recon: A/AAAA/MX/NS/TXT/CNAME/SOA + SPF/DKIM/DMARC email-auth presence.
 - web-scrape ($0.010) - Server-side URL scrape returning title + readable text. Use when you need plain text fast. Read-only.
 - whois ($0.010) - Domain WHOIS: registrar, creation/expiry dates, nameservers, availability. Read-only.
-- image-edit ($0.010) - Image editor: resize/rotate/crop/grayscale/blur/sharpen/brightness/contrast/flip/border via op list. Input url or base64.
 - image-optimize ($0.010) - Convert heic/png/jpeg -> webp/jpeg/png with compression + optional max_width resize. Reports saved %.
 - link-scan ($0.010) - URL safety scan: full redirect chain, tracking-param strip, urlhaus+openphish feeds, SSL validity, phishing-form heuristic, risk score.
 - security-headers ($0.010) - Grade a sites HTTP security headers (HSTS/CSP/X-Frame-Options/XXP/Referrer-Policy/Permissions-Policy). A-D grade.
@@ -56,16 +44,20 @@ Base URL: https://satisfaction-genetic-lightbox-buying.trycloudflare.com
 - leak-check ($0.010) - Email against HaveIBeenPwned k-anonymity range API: breached? how many times?
 - subdomain-find ($0.010) - Passive subdomain discovery via crt.sh certificate transparency (no probing).
 - threat-intel ($0.010) - IP reputation: DNSBL blacklist hits + proxy/VPN/Tor + geo (ipwho.is). Verdict clean/suspicious.
+- email-verify ($0.010) - Email deliverability check: syntax + MX record presence + disposable-domain flag. DNS only, no send.
+- header-compare ($0.010) - Compare security headers of two sites side by side (HSTS/CSP/XFO/XXP/RP/PP). Migration + audit aid.
 - trend-watch ($0.010) - Recent signal volume on a keyword across news/social slices. Early-trend radar.
 - deep-search ($0.012) - Multi-query fan-out search: dedupe + rank results across 5 queries. Agent-grade discovery.
 - fact-check ($0.012) - Claim -> search corroborating/contradicting sources, return verdict (corroborated/contradicted/mixed).
 - repo2context ($0.015) - GitHub repo -> single LLM-ready context file: clones, strips lockfiles/binaries/minified, packs source into markdown. Size-capped.
 - citations ($0.015) - Fetch N URLs, return canonical BibTeX cites + cleaned text (RAG-ready corpus).
+- pdf-merge ($0.020) - Combine multiple PDFs into one (pass list of base64 PDFs). Contracts, reports, scans.
 - video-download ($0.020) - Direct download links for any video URL (yt-dlp, 1000+ platforms, capped 25MB).
 - exec-python ($0.020) - Isolated Python 3.12 sandbox: run a snippet with {"payload":...,"input":...} globals, capture stdout + result var. CPU/RAM-capped, no network. Mutating only inside sandbox.
 - video2mp3 ($0.020) - Video/audio URL -> clean mono MP3 (48kbps, yt-dlp + ffmpeg, 1000+ platforms). Returns base64. Platform blocks may apply (YouTube/Vimeo need auth).
 - file-scan ($0.020) - Static file analysis (nothing executed): sha256 vs MalwareBazaar, YARA rules, entropy, PDF active-content, PE imports/sections, archive entry listing. <=25MB.
 - research-brief ($0.020) - Topic -> search + fetch top sources -> markdown dossier with citations. Research on autopilot.
+- link-health ($0.020) - Crawl a page, report status of every outbound link (broken 4xx/5xx/timeout). Pre-publish link check.
 - extract-structured ($0.030) - Structured Web Data Extractor: fetch a URL, return JSON matching your schema via a fast LLM. Read-only. Cost ~$0.03.
 - pdf-extract ($0.030) - Extracts text from PDF URLs or base64. Agents lack poppler/pdftotext; we run it server-side.
 - ocr ($0.030) - OCR image to text (Tesseract; url or base64 input). Handles screenshots/scans/photos of text.
@@ -73,4 +65,5 @@ Base URL: https://satisfaction-genetic-lightbox-buying.trycloudflare.com
 - pdf-invoice ($0.030) - Generate invoice/receipt PDF from line items (seller, buyer, tax). Returns base64 PDF.
 - strip-metadata ($0.100) - Privacy scrubber: removes EXIF/GPS/comments from images and metadata from PDFs. One call before you post or share.
 - capture-page ($0.150) - Full-page screenshot and/or PDF of any URL via headless Chromium. Developers, agents, and users needing clean captures + PDF receipts without running a browser. Returns base64.
+- screenshot-mobile ($0.150) - Mobile-viewport (390x844) screenshot and/or PDF of a URL via headless Chromium. Responsive check without a device.
 - site-report ($0.250) - One-call website security + SSL audit: cert expiry/issuer, missing security headers, load speed. For site owners + devs.
