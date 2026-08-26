@@ -1,29 +1,49 @@
 # ox402
 
-58 micro-priced utilities for AI agents, paid per call via x402 (USDC on Base).
+73 micro-priced utilities for AI agents, paid per call via x402 (USDC on Base).
 Base URL: https://treating-arcade-overall-enough.trycloudflare.com
 
 - No free trial: every call settles in USDC via x402 (Standard 402 handshake + X-PAYMENT header).
-- stt/stt-fast/tts bill per started minute of audio; free tier caps audio at 5 min/file.
-- gen-video is paid-only.
+- Everything runs on-CPU/offline except STT (Groq Whisper). No NVIDIA/cloud generative models.
+- stt/stt-fast/tts bill per audio; tts is offline espeak-ng (131 voices).
 - MCP server: https://treating-arcade-overall-enough.trycloudflare.com/mcp402/ (streamable HTTP)
-- Catalog JSON: https://treating-arcade-overall-enough.trycloudflare.com/x402/
+- Catalog JSON: https://treating-arcade-overall-enough.trycloudflare.com/x402/catalog
 
 ## Tools
+
+- tts-voices ($0.000) - List available offline espeak-ng voice codes (en-us, en-gb, es, fr, de, it, ja, zh, ...). Free reference call.
 - kv-get ($0.001) - Read a key from ox402 ephemeral memory (written via kv-put). Returns found/value/ttl_seconds_left. Read-only.
 - token-count ($0.001) - Exact token counts (tiktoken) for GPT/o-series; honest char-ratio estimates for Claude/Gemini/Llama. Optional cost estimate.
+- epoch ($0.001) - Unix<->ISO8601 convert; no arg returns now.
+- slugify ($0.001) - URL-safe slug from arbitrary text.
 - stt-fast ($0.002) - Fast local speech-to-text (whisper-tiny): cheap transcript for clear audio. Billed $0.002 per started minute. Free trial caps at 5 min/file. Less accurate than stt.
+- tts ($0.002) - Tiny offline text-to-speech via espeak-ng: WAV in 30+ languages, no API key, no GPU. Billed $0.002 per 1k chars (<=1500 chars/call). Returns base64 WAV. Voice codes via tts-voices.
 - kv-put ($0.002) - Ephemeral key-value memory for stateless agents: store JSON value, TTL 1-24h, <=8KB. Mutating.
 - embed ($0.002) - Text embeddings (384-dim bge-small, runs locally): semantic search/similarity without managing vector DB keys. Up to 32 texts.
+- json-validate ($0.002) - Lint + structurally validate JSON (object vs array, key count).
+- color-convert ($0.002) - Convert hex<->rgb<->hsl.
+- regex-test ($0.003) - Test a regex against text: matches or replace preview.
+- ua-parse ($0.003) - Parse a User-Agent into browser/OS/device + bot flag.
+- password ($0.003) - Cryptographically random passphrase or password (secrets module).
 - crypto-price ($0.004) - Crypto spot prices + 24h change (CoinGecko ids). Read-only.
 - fx-rates ($0.004) - Fiat FX rates (ECB daily reference). Read-only.
 - weather ($0.004) - Current weather + 3-day forecast by city or coords. Read-only.
+- http-headers ($0.004) - HTTP response status + full headers for a URL. Read-only.
+- csv-to-json ($0.004) - Parse CSV text into JSON rows with column names.
+- json-to-csv ($0.004) - Flatten a JSON array of objects into CSV.
+- yaml-to-json ($0.004) - Convert YAML to JSON (safe_load).
+- jsonpath ($0.004) - Extract nodes from JSON via JSONPath expression.
+- text-diff ($0.004) - Unified line diff between two texts (added/removed counts).
 - dns-lookup ($0.005) - DNS records A/AAAA/MX/NS/TXT/CNAME for a domain. Read-only.
 - stock-quote ($0.005) - Stock quote: last price, prev close, exchange (Yahoo Finance). Read-only.
 - geoip ($0.005) - IP geolocation: country/city/ISP/proxy/hosting flags. Read-only.
 - temp-webhook ($0.005) - Ephemeral public webhook URL (1h TTL): POST anything to it, then poll the same URL to read payloads. No server needed.
 - qr-code-gen ($0.005) - QR code PNG from any text/url/wifi-config/vcard/payment link, custom colors. Pure CPU, instant.
 - site-down-check ($0.005) - Is it down or just you? Probe from ox402 vantage + independent check-host.net nodes, latency, verdict. Honest about vantage limits.
+- hash ($0.005) - Hash text with sha256/sha1/md5/any hashlib algo. Deterministic digests.
+- uuid ($0.005) - Generate random UUID v4. One per call.
+- unit-convert ($0.005) - Convert length/mass units (m/ft/km/mi/kg/lb/g/oz...). Simple physical units.
+- robots ($0.005) - Fetch robots.txt and return structured allow/disallow rules.
 - base64 ($0.005) - Base64 encode/decode of text (mode=decode for the reverse). Instant.
 - csv2json ($0.005) - Convert CSV text to JSON array of row objects. Handles quoted fields via csv module.
 - json2csv ($0.005) - Convert JSON array of flat objects to CSV text. Column union across rows.
@@ -32,17 +52,16 @@ Base URL: https://treating-arcade-overall-enough.trycloudflare.com
 - sort-json ($0.005) - Sort a JSON array of objects by key (asc/desc).
 - unique ($0.005) - Deduplicate lines or list items, preserving first-seen order. Returns count too.
 - regex-extract ($0.005) - Extract all regex matches from text. Quick pattern pulls without writing code.
-- hash ($0.005) - Hash text with sha256/sha1/md5/any hashlib algo. Deterministic digests.
-- uuid ($0.005) - Generate random UUID v4. One per call.
 - jwt-decode ($0.005) - Decode JWT header+payload (no signature verification). Debug tokens safely.
 - timestamp ($0.005) - Unix epoch <-> ISO8601 conversion, both directions, auto-detected.
-- unit-convert ($0.005) - Convert length/mass units (m/ft/km/mi/kg/lb/g/oz...). Simple physical units.
 - diff ($0.005) - Unified diff of two texts (a vs b). Line-level changes at a glance.
 - json-format ($0.005) - Pretty-print/minify JSON with chosen indent. Validate + format in one call.
 - json-merge ($0.005) - Deep-merge two JSON objects (b wins on conflicts). Config layering.
 - qrcode ($0.005) - QR code PNG from any text/url, returned as data-url. Scan-ready instantly.
 - wayback ($0.006) - Wayback Machine: latest snapshot URL + optional snapshot history for a site. Read-only.
 - stt ($0.006) - Speech-to-text via Whisper-large-v3: timestamped transcript from audio URL/base64. Billed $0.006 per started minute. Free trial caps at 5 min/file; paid allows 25MB/file up to 120 min. Premium accuracy.
+- ssl-check ($0.006) - TLS certificate validity, expiry (days), issuer, SANs for a host:443. Read-only.
+- sitemap ($0.006) - Fetch + parse a sitemap.xml, list URLs (and nested maps).
 - search ($0.008) - Read-only web search (DuckDuckGo): title+url+snippet per result. Cost $0.008/call.
 - html2md ($0.008) - Extracts clean Markdown from any public URL (no raw DOM noise). Read-only.
 - video-info ($0.008) - Video metadata + all stream formats (YouTube/TikTok/Vimeo/X/1000+ sites) via yt-dlp. Read-only.
@@ -65,6 +84,3 @@ Base URL: https://treating-arcade-overall-enough.trycloudflare.com
 - ocr ($0.030) - OCR image to text (Tesseract; url or base64 input). Handles screenshots/scans/photos of text.
 - md2pdf ($0.030) - Markdown to styled PDF document (tables/headings supported). Returns base64 PDF. Non-destructive.
 - pdf-invoice ($0.030) - Generate invoice/receipt PDF from line items (seller, buyer, tax). Returns base64 PDF.
-- tts ($0.030) - Text-to-speech WAV (NVIDIA Magpie-Multilingual, natural voices). Billed $0.03 per started minute of generated audio (<=1500 chars/call). Returns base64 WAV.
-- gen-image ($0.060) - FLUX.1-dev text-to-image: photoreal PNG up to 1344px. Returns base64 data-url in ~5-20s. Paid only (no free trial on this tool).
-- gen-video ($0.200) - Text-to-video MP4 (WAN/Cosmos family, ~3-5s clip, minutes latency, async polled server-side). Returns base64 MP4 when ready. $0.20/video, paid only.
