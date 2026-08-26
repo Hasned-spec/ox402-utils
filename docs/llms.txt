@@ -1,12 +1,12 @@
 # ox402
 
-57 micro-priced utilities for AI agents, paid per call via x402 (USDC on Base).
-Base URL: https://treating-arcade-overall-enough.trycloudflare.com
+76 micro-priced utilities for AI agents, paid per call via x402 (USDC on Base).
+Base URL: https://satisfaction-genetic-lightbox-buying.trycloudflare.com
 
 - Free tier: first 5 calls per IP, lifetime (gen-3d and gen-video excluded - paid only).
 - stt/stt-fast/tts bill per started minute of audio.
-- MCP server: https://treating-arcade-overall-enough.trycloudflare.com/mcp402/ (streamable HTTP)
-- Catalog JSON: https://treating-arcade-overall-enough.trycloudflare.com/x402/
+- MCP server: https://satisfaction-genetic-lightbox-buying.trycloudflare.com/mcp402/ (streamable HTTP)
+- Catalog JSON: https://satisfaction-genetic-lightbox-buying.trycloudflare.com/x402/
 
 ## Tools
 
@@ -25,6 +25,23 @@ Base URL: https://treating-arcade-overall-enough.trycloudflare.com
 - geoip ($0.005) - IP geolocation: country/city/ISP/proxy/hosting flags. Read-only.
 - temp-webhook ($0.005) - Ephemeral public webhook URL (1h TTL): POST anything to it, then poll the same URL to read payloads. No server needed.
 - robots ($0.005) - Fetch robots.txt and return structured allow/disallow rules.
+- base64 ($0.005) - Base64 encode/decode of text (mode=decode for the reverse). Instant.
+- csv2json ($0.005) - Convert CSV text to JSON array of row objects. Handles quoted fields via csv module.
+- json2csv ($0.005) - Convert JSON array of flat objects to CSV text. Column union across rows.
+- csv-col ($0.005) - Extract one column from CSV text as a list. Fast column slice.
+- csv-sum ($0.005) - Sum a numeric column across CSV rows. Non-numeric treated as 0.
+- sort-json ($0.005) - Sort a JSON array of objects by key (asc/desc).
+- unique ($0.005) - Deduplicate lines or list items, preserving first-seen order. Returns count too.
+- regex-extract ($0.005) - Extract all regex matches from text. Quick pattern pulls without writing code.
+- hash ($0.005) - Hash text with sha256/sha1/md5/any hashlib algo. Deterministic digests.
+- uuid ($0.005) - Generate random UUID v4. One per call.
+- jwt-decode ($0.005) - Decode JWT header+payload (no signature verification). Debug tokens safely.
+- timestamp ($0.005) - Unix epoch <-> ISO8601 conversion, both directions, auto-detected.
+- unit-convert ($0.005) - Convert length/mass units (m/ft/km/mi/kg/lb/g/oz...). Simple physical units.
+- diff ($0.005) - Unified diff of two texts (a vs b). Line-level changes at a glance.
+- json-format ($0.005) - Pretty-print/minify JSON with chosen indent. Validate + format in one call.
+- json-merge ($0.005) - Deep-merge two JSON objects (b wins on conflicts). Config layering.
+- qrcode ($0.005) - QR code PNG from any text/url, returned as data-url. Scan-ready instantly.
 - stt ($0.006) - Speech-to-text via Whisper-large-v3: timestamped transcript from audio URL/base64. Billed $0.006 per started minute. Free trial caps at 5 min/file; paid allows 25MB/file up to 120 min. Premium accuracy.
 - ssl-check ($0.006) - TLS certificate validity, expiry (days), issuer, SANs for a host:443. Read-only.
 - sitemap ($0.006) - Fetch + parse a sitemap.xml, list URLs (and nested maps).
@@ -41,6 +58,7 @@ Base URL: https://treating-arcade-overall-enough.trycloudflare.com
 - whois ($0.010) - Domain WHOIS: registrar, creation/expiry dates, nameservers, availability. Read-only.
 - image-optimize ($0.010) - Convert heic/png/jpeg -> webp/jpeg/png with compression + optional max_width resize. Reports saved %.
 - link-scan ($0.010) - URL safety scan: full redirect chain, tracking-param strip, urlhaus+openphish feeds, SSL validity, phishing-form heuristic, risk score.
+- text2img ($0.010) - Render text to PNG image (PIL): custom width/font size, dark or light theme. No diffusion.
 - security-headers ($0.010) - Grade a sites HTTP security headers (HSTS/CSP/X-Frame-Options/XXP/Referrer-Policy/Permissions-Policy). A-D grade.
 - port-scan ($0.010) - TCP connect scan of common ports (honest: one datacenter vantage, not stealth).
 - leak-check ($0.010) - Email against HaveIBeenPwned k-anonymity range API: breached? how many times?
@@ -61,6 +79,7 @@ Base URL: https://treating-arcade-overall-enough.trycloudflare.com
 - pdf-merge ($0.020) - Combine multiple PDFs into one (pass list of base64 PDFs). Contracts, reports, scans.
 - exec-python ($0.020) - Isolated Python 3.12 sandbox: run a snippet with {"payload":...,"input":...} globals, capture stdout + result var. CPU/RAM-capped, no network. Mutating only inside sandbox.
 - file-scan ($0.020) - Static file analysis (nothing executed): sha256 vs MalwareBazaar, YARA rules, entropy, PDF active-content, PE imports/sections, archive entry listing. <=25MB.
+- base64-url ($0.020) - Fetch a file from a URL (<=25MB) and return it as base64 data-url. Read-only.
 - research-brief ($0.020) - Topic -> search + fetch top sources -> markdown dossier with citations. Research on autopilot.
 - link-health ($0.020) - Crawl a page, report status of every outbound link (broken 4xx/5xx/timeout). Pre-publish link check.
 - capture-page ($0.060) - Full-page screenshot and/or PDF of any URL via headless Chromium. Developers, agents, and users needing clean captures + PDF receipts without running a browser. Returns base64.
