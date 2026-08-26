@@ -43,6 +43,9 @@ nav a:hover{color:#14161a}
 .facts{display:flex;gap:26px;flex-wrap:wrap;margin:18px 0 4px;font-size:13.5px;color:#45423a;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif}
 .facts b{display:block;font-size:19px;color:#14161a;font-weight:700;letter-spacing:-.02em}
 .facts span{color:#8a8577;font-size:12px}
+.cta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:16px;padding:12px 14px;background:#f4f2ea;border:1px solid #e6e2d7;border-radius:8px;font-size:13px}
+.cta-label{color:#45423a}.cta-label b{color:#1f5f5b}
+.cta code{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#fff;border:1px solid #cfcbc0;border-radius:4px;padding:5px 8px;color:#1c1e21;flex:1;min-width:200px;overflow-x:auto;white-space:nowrap}
 
 /* sections */
 section{padding:30px 0}
@@ -141,6 +144,11 @@ footer a{color:#55503f}
       <div><b id="fact-tools">—</b><span>paid tools</span></div>
       <div><b>$0.001–$0.10</b><span>per call</span></div>
       <div><b>Base USDC</b><span>x402 payment</span></div>
+    </div>
+    <div class="cta">
+      <span class="cta-label">First call is <b>$0.004</b> — try it:</span>
+      <code id="cta-cmd">x402 curl https://satisfaction-genetic-lightbox-buying.trycloudflare.com/x402/paid/crypto-price -H 'Content-Type: application/json' -d '{"ids":"bitcoin,ethereum"}'</code>
+      <button class="ghost" id="cta-copy">Copy</button>
     </div>
   </div>
 
@@ -417,6 +425,10 @@ document.getElementById('run').onclick = async () => {
 document.getElementById('reset').onclick = () => { syncBody(); hideOut(); };
 document.getElementById('q').oninput = e => renderGrid(e.target.value);
 
+document.getElementById('cta-copy').onclick = () => {
+  navigator.clipboard.writeText(document.getElementById('cta-cmd').textContent);
+  const b=document.getElementById('cta-copy'); b.textContent='Copied ✓'; setTimeout(()=>b.textContent='Copy',1500);
+};
 load();
 </script>
 </body>
