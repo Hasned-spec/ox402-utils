@@ -4,26 +4,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ox402 — utility APIs for software agents</title>
-<meta name="description" content="47 small, reliable HTTP utilities. Pay per call in USDC on Base. No accounts, no API keys.">
+<meta name="description" content="57 capability APIs an AI agent can't run in its own sandbox: web research, security recon, neural TTS, speech, document + media conversion, breach/SSL audits, full-page screenshots. Pay per call in USDC on Base. No accounts, no API keys.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231f5f5b'/%3E%3Ctext x='16' y='21' font-family='Georgia,serif' font-size='11' fill='%23fcfcfa' text-anchor='middle'%3E402%3C/text%3E%3C/svg%3E">
 <style>
-/* ---------- base ---------- */
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{
-  font-family:"Georgia",serif;
-  background:#fcfcfa;color:#1c1e21;line-height:1.6;font-size:16px;
-  -webkit-font-smoothing:antialiased;
-}
-.mono,.mono input,.mono pre,.mono code,.mono td.num{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
-.wrap{max-width:880px;margin:0 auto;padding:0 24px}
+body{font-family:"Georgia",serif;background:#fcfcfa;color:#1c1e21;line-height:1.6;font-size:16px;-webkit-font-smoothing:antialiased}
+.mono,.mono pre,.mono code,.mono td.num{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px}
 a{color:#1f5f5b;text-decoration:none;border-bottom:1px solid #d8d2c4}
 a:hover{border-bottom-color:#1f5f5b}
 h1,h2,h3,h4{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:#14161a;letter-spacing:-.01em}
 p{margin:0 0 14px}
-hr{border:0;border-top:1px solid #e6e2d7;margin:36px 0}
+hr{border:0;border-top:1px solid #e6e2d7;margin:34px 0}
 
-/* ---------- header ---------- */
-header{border-bottom:1px solid #e6e2d7;background:#fff}
+/* header */
+header{border-bottom:1px solid #e6e2d7;background:#fff;position:sticky;top:0;z-index:5}
 .hrow{display:flex;align-items:center;gap:28px;height:58px}
 .logo{font-weight:700;font-size:17px;letter-spacing:-.02em;border-bottom:none;color:#14161a}
 .logo span{color:#8a8577;font-weight:400}
@@ -32,314 +28,320 @@ nav a{color:#55503f;border-bottom:none}
 nav a:hover{color:#14161a}
 .spacer{flex:1}
 .hcta{font-size:13px;color:#55503f;border-bottom:none}
+@media(max-width:640px){nav{display:none}}
 
-/* ---------- hero (compact, no banner) ---------- */
-.intro{padding:52px 0 8px;max-width:640px}
-.intro h1{font-size:30px;line-height:1.25;margin-bottom:14px;font-weight:700}
-.intro p.lede{font-size:18px;color:#45423a;margin-bottom:10px}
-.intro p.sub{font-size:14.5px;color:#75705f}
+/* intro */
+.intro{padding:46px 0 4px;max-width:680px}
+.intro h1{font-size:29px;line-height:1.25;margin-bottom:14px;font-weight:700}
+.intro p.lede{font-size:17.5px;color:#45423a;margin-bottom:10px}
+.intro p.sub{font-size:14px;color:#75705f}
+.facts{display:flex;gap:26px;flex-wrap:wrap;margin:18px 0 4px;font-size:13.5px;color:#45423a;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif}
+.facts b{display:block;font-size:19px;color:#14161a;font-weight:700;letter-spacing:-.02em}
+.facts span{color:#8a8577;font-size:12px}
 
-/* ---------- sections ---------- */
-section{padding:34px 0}
-section>h2{font-size:19px;margin-bottom:6px;font-weight:600}
-section>p.desc{color:#5d5949;font-size:14.5px;margin-bottom:22px;max-width:620px}
+/* sections */
+section{padding:30px 0}
+section>h2{font-size:19px;margin-bottom:4px;font-weight:600}
+section>p.desc{color:#5d5949;font-size:14px;margin-bottom:18px;max-width:640px}
+pre{background:#14161a;color:#d8e5df;border-radius:6px;padding:14px 16px;font-size:12.5px;line-height:1.55;overflow-x:auto;margin:12px 0}
+pre .c{color:#7d9186}
+.steps{counter-reset:s;max-width:680px}
+.steps li{list-style:none;counter-increment:s;margin-bottom:13px;padding-left:34px;position:relative;font-size:15px}
+.steps li:before{content:counter(s);position:absolute;left:0;top:2px;width:22px;height:22px;border:1px solid #cfcbc0;border-radius:50%;font:600 12px/20px "Helvetica Neue",Helvetica,Arial,sans-serif;text-align:center;color:#55503f;background:#fff}
 
-/* ---------- playground ---------- */
+/* catalog as cards */
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+input[type=search]{font-size:14px;padding:8px 12px;border:1px solid #cfcbc0;background:#fff;border-radius:999px;outline:none;width:240px}
+input[type=search]:focus{border-color:#1f5f5b}
+.chips{display:flex;gap:7px;flex-wrap:wrap}
+.chip{font:500 12.5px/1 "Helvetica Neue",Helvetica,Arial,sans-serif;border:1px solid #cfcbc0;background:#fff;color:#55503f;border-radius:999px;padding:6px 13px;cursor:pointer}
+.chip:hover{border-color:#8a8577}
+.chip.active{background:#205c57;border-color:#17453f;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:12px}
+.card{border:1px solid #e6e2d7;border-radius:8px;background:#fff;padding:13px 14px;display:flex;flex-direction:column;gap:6px;transition:border-color .12s,box-shadow .12s}
+.card:hover{border-color:#b9b3a3;box-shadow:0 2px 10px rgba(20,20,20,.05)}
+.card .top{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.card .name{font:700 14px/1.2 "Helvetica Neue",Helvetica,Arial,sans-serif;color:#14161a}
+.card .price{font:600 13px/1 ui-monospace,Menlo,monospace;color:#1f5f5b;white-space:nowrap}
+.card .desc{font-size:12.8px;color:#5d5949;flex:1}
+.badges{display:flex;gap:5px;flex-wrap:wrap}
+.badge{font:500 10px/1 "Helvetica Neue",Helvetica,Arial,sans-serif;border-radius:99px;padding:2px 7px}
+.badge.permin{background:#eef4f1;color:#1f5f5b}
+.badge.neural{background:#f3eef8;color:#5b3a8a}
+.badge.paid{background:#fbf6e7;color:#8a6d1f}
+.empty{grid-column:1/-1;color:#8a8577;font-size:14px;padding:20px 0}
+
+/* playground */
 .play{display:flex;flex-direction:column;gap:10px}
 .controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-select,input[type=search],input[type=text]{
-  font-size:14px;padding:7px 10px;border:1px solid #cfcbc0;background:#fff;color:#1c1e21;border-radius:3px;outline:none}
+select,input[type=text]{font-size:14px;padding:7px 10px;border:1px solid #cfcbc0;background:#fff;color:#1c1e21;border-radius:3px;outline:none}
 select:focus,input:focus{border-color:#1f5f5b}
-button{
-  font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:13.5px;
-  padding:7px 16px;background:#205c57;color:#fdfdfb;border:1px solid #17453f;border-radius:3px;cursor:pointer}
+button{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:13.5px;padding:7px 16px;background:#205c57;color:#fdfdfb;border:1px solid #17453f;border-radius:3px;cursor:pointer}
 button:hover{background:#17453f}
+button:disabled{opacity:.5;cursor:default}
 button.ghost{background:#fff;color:#1c1e21;border-color:#cfcbc0}
 button.ghost:hover{border-color:#8a8577}
-.quota{margin-left:auto;font-size:12.5px;color:#75705f}
-textarea#req{
-  width:100%;min-height:96px;font-size:13px;line-height:1.5;padding:10px;
-  border:1px solid #cfcbc0;border-radius:3px;background:#fff;color:#20303c;resize:vertical;outline:none}
+.hint{margin-left:auto;font-size:12.5px;color:#75705f}
+textarea#req{width:100%;min-height:110px;font-size:12.8px;line-height:1.5;padding:10px;border:1px solid #cfcbc0;border-radius:3px;background:#fff;color:#1c1e21;resize:vertical;outline:none}
 textarea#req:focus{border-color:#1f5f5b}
-pre.out{
-  background:#f6f5f0;border:1px solid #e6e2d7;border-radius:3px;padding:12px;
-  font-size:12.5px;line-height:1.5;max-height:340px;overflow:auto;white-space:pre-wrap;color:#33372e;display:none}
-.meta{font-size:12.5px;color:#75705f;min-height:18px}
-.meta.err{color:#8c3a2e}
-.meta.ok{color:#205c57}
+.out{border:1px solid #e6e2d7;border-radius:4px;background:#fff;min-height:44px}
+.out-head{display:flex;align-items:center;gap:10px;padding:7px 12px;border-bottom:1px solid #efebdf;font:500 12px "Helvetica Neue",Helvetica,Arial,sans-serif;color:#75705f}
+.status{font-weight:700}
+.ok{color:#1f5f5b}.err{color:#8a3b2f}
+.out-body{padding:10px 12px;max-height:340px;overflow:auto;font-size:12.3px;line-height:1.5}
+.out-body img,.out-body audio,.out-body video{max-width:100%;margin:6px 0;display:block}
+.out-body pre{background:#f6f4ec;color:#333;margin:0;padding:10px}
 
-/* ---------- catalog table ---------- */
-table{width:100%;border-collapse:collapse;font-size:13.5px}
-th{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;text-align:left;font-size:11.5px;
-   text-transform:uppercase;letter-spacing:.06em;color:#75705f;font-weight:600;
-   padding:8px 10px;border-bottom:2px solid #d9d4c6}
-td{padding:8px 10px;border-bottom:1px solid #eceadf;vertical-align:top}
-tr.click{cursor:pointer}
-tr.click:hover td{background:#f4f2ea}
-td.name{font-family:ui-monospace,Menlo,monospace;font-size:13px;color:#14161a}
-td.num{text-align:right;font-variant-numeric:tabular-nums;color:#205c57;white-space:nowrap}
-td.dim{color:#75705f;font-size:13px}
-tfoot td{border-bottom:none;color:#75705f;font-size:12.5px;padding-top:12px}
+/* limits */
+.limits{background:#f7f5ee;border:1px solid #e6e2d7;border-radius:8px;padding:20px 24px;max-width:720px}
+.limits ul{margin:6px 0 0}
+.limits li{margin-bottom:9px;font-size:14px;color:#45423a}
+.limits li b{color:#14161a}
 
-/* ---------- integration blocks ---------- */
-.docs{display:flex;gap:40px;align-items:flex-start}
-.docs .colL{flex:1.1}
-.docs .colR{flex:1;min-width:280px}
-.docs h3{font-size:15px;margin-bottom:8px;font-weight:600}
-.docs p{font-size:14px;color:#45423a}
-pre.snippet{background:#f6f5f0;border:1px solid #e6e2d7;border-radius:3px;padding:12px;
-  font-size:12px;line-height:1.55;overflow:auto;color:#33372e}
-code.inline{background:#f1efe7;border:1px solid #e6e2d7;border-radius:3px;padding:1px 5px;font-size:.86em}
-
-/* ---------- footer ---------- */
-footer{border-top:1px solid #e6e2d7;padding:26px 0 60px;color:#75705f;font-size:13px}
-footer .cols{display:flex;gap:44px;flex-wrap:wrap}
-footer h4{font-size:12px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;color:#55503f}
-footer li{list-style:none;margin:4px 0}
-footer a{color:#55503f;border-bottom:none}
-footer a:hover{color:#14161a;border-bottom:1px solid #d8d2c4}
-.fineprint{margin-top:26px;font-size:12px;color:#98937f}
-
-@media (max-width:720px){
-  .docs{flex-direction:column;gap:22px}
-  nav{display:none}
-  .intro h1{font-size:25px}
-}
+/* footer */
+footer{border-top:1px solid #e6e2d7;padding:26px 0 40px;color:#8a8577;font-size:13px;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif}
+footer a{color:#55503f}
+.addr{word-break:break-all}
 </style>
 </head>
 <body>
 
 <header>
   <div class="wrap hrow">
-    <div class="logo">ox402 <span>/ tools</span></div>
+    <a class="logo" href="/">ox402<span>&nbsp;/ utils</span></a>
     <nav>
-      <a href="#catalog">Catalog</a>
-      <a href="#integration">Integration</a>
-      <a href="#pricing">Pricing</a>
-      <a href="#about">About</a>
+      <a href="#tools">Tools</a>
+      <a href="#quickstart">Quickstart</a>
+      <a href="#playground">Try it</a>
+      <a href="#limits">Limits</a>
     </nav>
-    <div class="spacer"></div>
-    <a class="hcta" href="https://github.com/Hasned-spec/ox402-utils">GitHub &rarr;</a>
+    <span class="spacer"></span>
+    <a class="hcta mono" href="/x402/catalog">catalog.json →</a>
   </div>
 </header>
 
 <div class="wrap">
 
   <div class="intro">
-    <h1>Small, reliable APIs for software that pays for itself.</h1>
-    <p class="lede">Forty-seven utilities — search, screenshots, OCR, video downloads,
-       document generation, reference data — over plain HTTP.</p>
-    <p class="sub">Each call is settled on-chain in USDC on Base through the x402 standard.
-       No account, no API key, no monthly plan. Your first five calls are free.</p>
+    <h1>57 paid tools. One x402 handshake. Zero signup.</h1>
+    <p class="lede">ox402 is a self-serve utility grid for AI agents and builders — the things an agent
+       <b>can't</b> do inside its own sandbox: web research, security recon, <b>neural text-to-speech</b>,
+       speech, document + media conversion, full-page screenshots, and SSL/breach audits. Every call settles in
+       USDC on Base — no API key, no account, no subscription.</p>
+    <p class="sub" id="subline">Loading live catalog…</p>
+    <div class="facts">
+      <div><b id="fact-tools">—</b><span>paid tools</span></div>
+      <div><b>$0.001–$0.10</b><span>per call</span></div>
+      <div><b>Base USDC</b><span>x402 payment</span></div>
+    </div>
   </div>
 
-  <!-- ================= PLAYGROUND ================= -->
-  <section id="playground">
-    <h2>Try it</h2>
-    <p class="desc">Pick a tool, adjust the request, run it. The first five calls from your
-       network are free; after that the API returns an invoice you can pay with any x402 wallet.</p>
-    <div class="play mono">
-      <div class="controls">
-        <select id="tool"></select>
-        <button id="run">Run</button>
-        <span class="quota" id="quota"></span>
-      </div>
-      <textarea id="req" spellcheck="false"></textarea>
-      <div class="meta" id="meta"></div>
-      <pre class="out" id="out"></pre>
-    </div>
-  </section>
+  <hr>
 
-  <!-- ================= CATALOG ================= -->
-  <section id="catalog">
-    <h2>Catalog</h2>
-    <p class="desc">Prices are per call, in USD. Most tools answer in under a second.
-       Full request/response schemas are in the <a href="/x402/">machine-readable catalog</a>.</p>
-    <div class="controls" style="margin-bottom:14px">
-      <input type="search" id="q" placeholder="Filter tools…" style="width:260px">
-      <span class="quota" id="count"></span>
-    </div>
-    <table>
-      <thead><tr><th style="width:180px">Tool</th><th>Description</th><th style="width:80px;text-align:right">Price</th></tr></thead>
-      <tbody id="rows"></tbody>
-      <tfoot><tr><td colspan="3">Click any row to load it into the playground above.</td></tr></tfoot>
-    </table>
+  <section id="quickstart">
+    <h2>How a call works</h2>
+    <p class="desc">Standard x402. If you've called a paid endpoint before, you already know the dance.</p>
+    <ol class="steps">
+      <li>Call the endpoint. It answers <span class="mono">402</span> with a payment request.</li>
+      <li>Your wallet (or the Coinbase facilitator) signs a USDC transfer for the exact amount.</li>
+      <li>Retry with the <span class="mono">X-PAYMENT</span> header. We verify, run the tool, settle on-chain.</li>
+    </ol>
+<pre><span class="c"># POST with x402 payment (X-PAYMENT header from the 402 handshake):</span>
+curl -s https://&lt;tunnel&gt;/x402/paid/crypto-price \
+  -H 'Content-Type: application/json' \
+  -d '{"ids":"bitcoin,ethereum"}'
+
+<span class="c"># GET /x402/catalog → every tool with price, schema, sample body.</span>
+<span class="c"># MCP (streamable HTTP) at /mcp402/ for agent frameworks (Claude, LangChain, …).</span></pre>
   </section>
 
   <hr>
 
-  <!-- ================= INTEGRATION ================= -->
-  <section id="integration">
-    <h2>Integration</h2>
-    <p class="desc">Everything is one endpoint pattern: POST JSON, get JSON back.
-       Unpaid requests return <code class="inline">402</code> with a signed invoice;
-       retry with an <code class="inline">X-Payment</code> header and the result comes back.</p>
-    <div class="docs">
-      <div class="colL">
-        <h3>From curl or any HTTP client</h3>
-        <pre class="snippet mono">curl /x402/paid/search \
-  -H 'Content-Type: application/json' \
-  -d '{"query":"base usdc","count":3}'
+  <section id="tools">
+    <h2>The catalog</h2>
+    <p class="desc">Live from <span class="mono">GET /x402/catalog</span> — rendered here, so prices are never stale.
+       Every call requires an x402 USDC payment (no free tier). Search or tap a category to narrow it down.</p>
+    <div class="bar">
+      <input type="search" id="q" placeholder="search tools…">
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="grid" id="grid"><div class="empty">loading…</div></div>
+  </section>
 
-# 200 on free quota; otherwise 402 + PAYMENT-REQUIRED
-# pay, then resend with:  -H 'X-Payment: &lt;signed receipt&gt;'</pre>
+  <hr>
+
+  <section id="playground">
+    <h2>Try one right now</h2>
+    <p class="desc">Pick a tool, edit the JSON body, hit run. If your wallet hasn't paid yet, it returns a 402 — paste the
+       <span class="mono">X-PAYMENT</span> header and retry.</p>
+    <div class="play">
+      <div class="controls">
+        <select id="tool"><option value="">loading…</option></select>
+        <button id="run">Run</button>
+        <button class="ghost" id="reset">Reset body</button>
+        <span class="hint" id="price"></span>
       </div>
-      <div class="colR">
-        <h3>From Claude or another MCP client</h3>
-        <pre class="snippet mono">{
-  "mcpServers": {
-    "ox402": { "url": "/mcp402/" }
-  }
-}</pre>
-        <p style="margin-top:10px">Listed in the official MCP registry as
-           <code class="inline">io.github.Hasned-spec/ox402-utils</code>.
-           A Python client and LangChain adapter are in the
-           <a href="https://github.com/Hasned-spec/ox402-utils">repository</a>.</p>
+      <textarea id="req" spellcheck="false"></textarea>
+      <div class="out" id="out" hidden>
+        <div class="out-head"><span class="status mono" id="status"></span><span id="meta"></span></div>
+        <div class="out-body mono" id="outbody"></div>
       </div>
     </div>
   </section>
 
-  <!-- ================= PRICING ================= -->
-  <section id="pricing">
-    <h2>Pricing</h2>
-    <table style="max-width:640px">
-      <thead><tr><th></th><th style="text-align:right">Amount</th><th>Notes</th></tr></thead>
-      <tbody>
-        <tr><td>Trial</td><td class="num">$0.000</td><td class="dim">Five calls per network, lifetime. No card, no wallet needed.</td></tr>
-        <tr><td>Per call</td><td class="num">$0.003 – $0.02</td><td class="dim">Listed per tool above; USDC on Base, settled at request time.</td></tr>
-        <tr><td>Monthly</td><td class="num">$0.000</td><td class="dim">There is no subscription.</td></tr>
-      </tbody>
-    </table>
+  <hr>
+
+  <section id="limits">
+    <h2>Limits, stated plainly</h2>
+    <p class="desc">Every service has constraints. Here are ours, so your agent doesn't discover them the expensive way.</p>
+    <div class="limits">
+      <ul>
+        <li><b>No free trial.</b> Every call requires an x402 USDC payment — there is no unmetered path. This keeps the service honest about cost and stops abuse.</li>
+        <li><b>Speech & video bill per started minute.</b> STT $0.006/min (whisper-large-v3) or $0.002/min (whisper-tiny). TTS is <b>neural Kokoro-82M</b> at $0.004 / 1k chars (30+ English voices, runs offline on CPU). video2mp3 / video-download bill ~$0.0004 per minute of source — far cheaper than a flat fee, and there's no file-size cap.</li>
+        <li><b>Platform downloads:</b> YouTube and Vimeo block anonymous downloads from datacenter IPs. TikTok/X/Reddit/direct media URLs work. We say which failed and why instead of pretending.</li>
+        <li><b>Everything runs on-CPU.</b> No NVIDIA/cloud generative models. STT uses Groq's Whisper; TTS, images, PDFs and the whole utility pack are fully offline. No upstream outages or surprise throttling.</li>
+        <li><b>Browser captures are fully isolated.</b> Screenshots/PDFs run in a fresh, throwaway Chromium profile every call — no saved logins, cookies, or extensions persist, and the renderer is blocked from reaching private/loopback addresses (127.0.0.1, 10.x, 192.168.x, etc.). It can only fetch the public URL you give it. Nothing you send is ever stored.</li>
+        <li><b>Uploads are never executed.</b> file-scan, strip-metadata and image tools parse your bytes in memory and return a result; no file you upload is run, and inputs are not retained after the call.</li>
+      </ul>
+    </div>
   </section>
 
-  <!-- ================= ABOUT ================= -->
-  <section id="about">
-    <h2>About</h2>
-    <p style="max-width:620px;color:#45423a;font-size:14.5px">
-      ox402 is an independent utility service operated by a small automation practice.
-      It exists because agents need boring things done well — look up a record, render a
-      document, fetch a price — and most APIs make you open an account to do them.
-      Here the payment <em>is</em> the account: every request carries its own settlement,
-      verified by the Coinbase x402 facilitator and finalized on Base.</p>
-    <p style="max-width:620px;color:#45423a;font-size:14.5px">
-      The service runs on a single small server, keeps no personal data, and stores only
-      aggregate call counts. If a tool misbehaves, the catalog always reflects live state.</p>
-  </section>
+  <footer>
+    <div class="wrap" style="padding:0">
+      <p>ox402-utils · pay-to address <span class="addr mono">0x7869d1fe2d1de863b6fae4594d392343a69ed8e3</span> · Base mainnet USDC</p>
+      <p><a href="/x402/catalog">/x402/catalog</a> · <a href="/x402/health">/x402/health</a> · <a href="/llms.txt">llms.txt</a> · <a href="/api.txt">api.txt</a> · <a href="/mcp402/">MCP server</a> · x402 discovery at <span class="mono">/.well-known/x402</span></p>
+      <p>All calls settle in USDC on Base via x402 — no subscription, no free tier. MCP (streamable HTTP) at <span class="mono">/mcp402/</span> for agent frameworks.</p>
+    </div>
+  </footer>
 
 </div>
 
-<footer>
-  <div class="wrap">
-    <div class="cols">
-      <ul>
-        <li><h4>Service</h4></li>
-        <li><a href="/x402/">API catalog (JSON)</a></li>
-        <li><a href="/mcp402/">MCP endpoint</a></li>
-        <li><a href="#pricing">Pricing</a></li>
-      </ul>
-      <ul>
-        <li><h4>Developers</h4></li>
-        <li><a href="https://github.com/Hasned-spec/ox402-utils">GitHub &amp; Python client</a></li>
-        <li><a href="https://github.com/punkpeye/awesome-mcp-servers/pull/12879">Directory listing</a></li>
-      </ul>
-      <ul>
-        <li><h4>Contact</h4></li>
-        <li><a href="https://402index.io">402index listing</a></li>
-        <li>Seller wallet <span class="mono">0x7869…d8e3</span></li>
-      </ul>
-    </div>
-    <div class="fineprint">© 2026 ox402 · Settled on Base · Built without a framework</div>
-  </div>
-</footer>
+<script>
+const CATS = [
+  ['Research & web intelligence', ['search','html2md','web-scrape','extract-structured','whois','dns-lookup','deep-search','research-brief','citations','fact-check','trend-watch','web-archive']],
+  ['Documents & media', ['pdf-extract','ocr','md2pdf','pdf-invoice','video-info','video-download','video2mp3','image-optimize','image-compress','capture-page','screenshot-mobile','pdf-merge']],
+  ['Speech', ['stt','stt-fast','tts','tts-voices']],
+  ['Security & recon', ['link-scan','file-scan','security-headers','cors-check','cookie-flags','dns-recon','port-scan','leak-check','subdomain-find','threat-intel','site-report','strip-metadata','email-verify','reverse-dns','header-compare']],
+  ['Finance & world data', ['crypto-price','stock-quote','fx-rates','weather','geoip']],
+  ['Dev & data utilities', ['http-headers','ssl-check','exec-python','repo2context','md-compress','temp-webhook','robots','sitemap','link-health']],
+];
+let TOOLS = {};
+let activeCat = null;
 
-<dialog id="dlg" style="border:1px solid #cfcbc0;border-radius:4px;max-width:620px;width:92vw;padding:20px;background:#fcfcfa">
-  <h3 id="d-name" style="font-size:16px;display:flex;justify-content:space-between"><span></span><span class="mono" style="color:#205c57;font-size:14px"></span></h3>
-  <p id="d-desc" style="color:#5d5949;font-size:13.5px;margin:6px 0 10px"></p>
-  <textarea id="d-body" spellcheck="false" style="width:100%;height:130px;font-size:12.5px;border:1px solid #cfcbc0;border-radius:3px;padding:10px;background:#fff;color:#20303c"></textarea>
-  <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
-    <span class="meta" id="d-meta" style="margin-right:auto"></span>
-    <button class="ghost" onclick="document.getElementById('dlg').close()" style="background:#fcfcfa;color:#1c1e21">Close</button>
-    <button id="d-run">Run</button>
-  </div>
-  <pre class="out" id="d-out" style="margin-top:12px"></pre>
-</dialog>
-
-<script>fetch('api.txt',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{t=t.trim();if(t)window.OX402_API=t;});</script><script>
-const APIROOT=(()=>{const m=location.pathname.match(/^\/ox402-utils/);return (m?m[0]:'')+location.origin;})();
-// when hosted on github pages (/ox402-utils/) the API lives on the tunnel;
-// api.txt next to this file carries the live base URL
-const BASE=(window.OX402_API||'')+ '/x402';;
-let TOOLS={};
-let used=0, FREE=5;
-const $=s=>document.querySelector(s);
+function fmt(n){ return '$' + Number(n).toFixed(4).replace(/0+$/,'').replace(/\.$/,''); }
+function perMin(id){ return id==='stt'||id==='stt-fast'||id==='video2mp3'||id==='video-download'; }
+function isNeural(id){ return id==='tts'; }
 
 async function load(){
-  const cat=await (await fetch(BASE+'/')).json();
-  TOOLS=cat.tools||{};
-  // playground select
-  const names=Object.keys(TOOLS).sort();
-  $('#tool').innerHTML=names.map(n=>`<option value="${n}">${n} — $${TOOLS[n].price.toFixed(3)}</option>`).join('');
-  $('#tool').addEventListener('change',()=>fillReq($('#tool').value));
-  fillReq(names[0]);
-  $('#run').addEventListener('click',()=>run($('#tool').value,'#out','#meta',true));
-  // table
-  $('#q').addEventListener('input',()=>renderTable($('#q').value.toLowerCase()));
-  renderTable('');
+  try {
+    const d = await (await fetch('/x402/catalog')).json();
+    TOOLS = d.tools || {};
+    document.getElementById('fact-tools').textContent = d.tool_count;
+    document.getElementById('subline').textContent =
+      `${d.tool_count} tools live · ${fmt(Math.min(...Object.values(TOOLS).map(t=>t.price)))} to ${fmt(Math.max(...Object.values(TOOLS).map(t=>t.price)))} per call · settle in USDC on Base`;
+    renderChips();
+    renderGrid();
+    renderSelect();
+  } catch(e){
+    document.getElementById('subline').textContent = 'Catalog temporarily unreachable — endpoints still up.';
+  }
 }
-function fillReq(n){
-  let s=TOOLS[n]?.example??{}; try{s=JSON.stringify(s,null,2)}catch(e){}
-  $('#req').value=s;
+
+function renderChips(){
+  const c = document.getElementById('chips');
+  let h = `<span class="chip ${activeCat===null?'active':''}" data-cat="">All</span>`;
+  for(const [name] of CATS) h += `<span class="chip ${activeCat===name?'active':''}" data-cat="${name}">${name}</span>`;
+  c.innerHTML = h;
+  c.querySelectorAll('.chip').forEach(ch => ch.onclick = () => {
+    activeCat = ch.dataset.cat || null;
+    renderChips(); renderGrid();
+  });
 }
-function renderTable(q){
-  const names=Object.keys(TOOLS).filter(n=>!q||(n+' '+TOOLS[n].desc).toLowerCase().includes(q)).sort((a,b)=>TOOLS[a].price-TOOLS[b].price);
-  $('#rows').innerHTML=names.map(n=>{
-    const t=TOOLS[n];
-    return `<tr class="click" onclick="openDlg('${n}')">
-      <td class="name">${n}</td><td class="dim">${t.desc}</td>
-      <td class="num">$${t.price.toFixed(3)}</td></tr>`;}).join('')
-    || '<tr><td colspan="3" class="dim">No matches.</td></tr>';
-  $('#count').textContent=`${names.length} of ${Object.keys(TOOLS).length} tools`;
-}
-function setQuota(){ $('#quota').textContent = used>=FREE ? 'free quota spent — calls now require payment' : `${FREE-used} free call${FREE-used===1?'':'s'} remaining`; }
-async function run(n,outSel,metaSel,src){
-  const meta=$(metaSel), out=$(outSel);
-  const ta=$(src==='dlg'?'#d-body':'#req');
-  let body={}; try{body=JSON.parse(ta.value||'{}')}
-  catch(e){meta.textContent='Request is not valid JSON.';meta.className='meta err';return}
-  meta.textContent='Working…'; meta.className='meta'; out.style.display='none';
-  const t0=performance.now();
-  try{
-    const r=await fetch(BASE+'/paid/'+n,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    const j=await r.json().catch(()=>({}));
-    out.style.display='block'; out.textContent=JSON.stringify(j,null,2).slice(0,20000);
-    const ms=Math.round(performance.now()-t0);
-    if(r.ok){
-      if(j.free_tier!==undefined&&j.free_remaining!==undefined){used=FREE-j.free_remaining;}
-      else if(src==='main'){used=Math.min(FREE,used+1);}
-      setQuota();
-      meta.textContent=(j.free_tier?'Completed on the free tier':'Completed')+' — '+ms+' ms';
-      meta.className='meta ok';
-    }else if(r.status===402){
-      meta.textContent='Free quota spent — this tool needs payment. The invoice below is what an x402 client signs.';
-      meta.className='meta err';
-    }else{
-      meta.textContent='HTTP '+r.status+' — see response.'; meta.className='meta err';
+
+function renderGrid(filt=''){
+  const grid = document.getElementById('grid');
+  const f = filt.toLowerCase();
+  let html = '';
+  for(const [catName, ids] of CATS){
+    if(activeCat && activeCat !== catName) continue;
+    const rows = ids.filter(id => TOOLS[id]).filter(id =>
+      !f || id.includes(f) || (TOOLS[id].desc||'').toLowerCase().includes(f));
+    if(!rows.length) continue;
+    if(!f) html += `<div class="empty" style="font:600 12px 'Helvetica Neue',sans-serif;color:#1f5f5b;letter-spacing:.06em;text-transform:uppercase;padding:4px 0 2px">${catName}</div>`;
+    for(const id of rows){
+      const t = TOOLS[id];
+      let badges = '';
+      if(perMin(id)) badges += '<span class="badge permin">/min</span>';
+      if(isNeural(id)) badges += '<span class="badge neural">neural</span>';
+      if(t.tier === 'paid') badges += '<span class="badge paid">paid</span>';
+      const priceTxt = perMin(id) ? fmt(t.price).replace(/$/,'').replace(/0+$/,'').replace(/\.$/,'') + '/min*' : fmt(t.price);
+      html += `<div class="card"><div class="top"><span class="name">${id}</span><span class="price">${priceTxt}</span></div>` +
+              `<div class="desc">${(t.desc||'').replace(/^Cost ~?\$[\d.]+ ?(\/call)?\.? ?/i,'')}</div>` +
+              (badges ? `<div class="badges">${badges}</div>` : '') + `</div>`;
     }
-  }catch(e){meta.textContent='Network error.';meta.className='meta err'}
+  }
+  grid.innerHTML = html || '<div class="empty">no match</div>';
 }
-function openDlg(n){
-  const t=TOOLS[n];
-  $('#d-name span').textContent=n;
-  $('#d-name .mono').textContent='$'+t.price.toFixed(3)+' / call';
-  $('#d-desc').textContent=t.desc;
-  let s=t.example??{}; try{s=JSON.stringify(s,null,2)}catch(e){}
-  $('#d-body').value=s;
-  $('#d-out').style.display='none';
-  const dm=$('#d-meta'); dm.textContent=''; dm.className='meta';
-  $('#d-run').onclick=()=>run(n,'#d-out','#d-meta','dlg');
-  document.getElementById('dlg').showModal();
+
+function renderSelect(){
+  const sel = document.getElementById('tool');
+  sel.innerHTML = Object.keys(TOOLS).sort().map(k=>`<option>${k}</option>`).join('');
+  sel.value = 'crypto-price';
+  syncBody();
+  sel.onchange = () => { syncBody(); hideOut(); };
 }
-setQuota(); load();
+function syncBody(){
+  const t = document.getElementById('tool').value;
+  if(!TOOLS[t]) return;
+  document.getElementById('req').value = JSON.stringify(TOOLS[t].sample, null, 2);
+  document.getElementById('price').textContent = `${fmt(TOOLS[t].price)}${perMin(t)?' / started min':''}`;
+}
+function hideOut(){ document.getElementById('out').hidden = true; }
+
+function renderResult(d, status){
+  const out = document.getElementById('out');
+  const st = document.getElementById('status');
+  const ob = document.getElementById('outbody');
+  st.textContent = status;
+  st.className = 'status mono ' + (status.startsWith('2') ? 'ok' : 'err');
+  document.getElementById('meta').textContent = d.payer ? `paid by ${String(d.payer).slice(0,10)}…` : '';
+  const res = d.result !== undefined ? d.result : d;
+  ob.innerHTML = '';
+  const pick = (k) => res && res[k];
+  if(pick('data_url')){
+    const du = String(res.data_url);
+    if(du.startsWith('data:image')){ const im=document.createElement('img'); im.src=du; ob.appendChild(im); }
+    else if(du.startsWith('data:audio')){ const a=document.createElement('audio'); a.src=du; a.controls=true; ob.appendChild(a); }
+    else if(du.startsWith('data:video')){ const v=document.createElement('video'); v.src=du; v.controls=true; ob.appendChild(v); }
+    else if(du.startsWith('data:application/pdf')){ const a=document.createElement('a'); a.href=du; a.download=(res.format||'doc')+'.pdf'; a.textContent='download PDF ('+(res.bytes||'?')+' bytes)'; ob.appendChild(a); }
+  }
+  const strip = {...res}; delete strip.data_url; delete strip.context;
+  const txt = JSON.stringify(res.context ? {...strip, context:`(${res.context.length} chars)`} : strip, null, 2);
+  const pre = document.createElement('pre');
+  pre.textContent = txt.length > 8000 ? txt.slice(0,8000) + '\n… truncated' : txt;
+  ob.appendChild(pre);
+  out.hidden = false;
+}
+
+document.getElementById('run').onclick = async () => {
+  const btn = document.getElementById('run');
+  const t = document.getElementById('tool').value;
+  if(!t) return;
+  let body;
+  try { body = JSON.parse(document.getElementById('req').value); }
+  catch(e){ renderResult({error:'invalid JSON: '+e.message}, '400'); return; }
+  btn.disabled = true; btn.textContent = 'Running…';
+  try {
+    const r = await fetch('/x402/paid/'+t, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+    const d = await r.json().catch(()=>({error:'non-JSON response'}));
+    renderResult(d, String(r.status));
+  } catch(e){ renderResult({error:'network error: '+e.message}, 'ERR'); }
+  btn.disabled = false; btn.textContent = 'Run';
+};
+document.getElementById('reset').onclick = () => { syncBody(); hideOut(); };
+document.getElementById('q').oninput = e => renderGrid(e.target.value);
+
+load();
 </script>
 </body>
 </html>
