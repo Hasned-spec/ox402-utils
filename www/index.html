@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ox402 — utility APIs for software agents</title>
+<meta name="description" content="57 capability APIs an AI agent can't run in its own sandbox: web research, security recon, neural TTS, speech, document + media conversion, breach/SSL audits, full-page screenshots. Pay per call in USDC on Base. No accounts, no API keys.">
+<link rel="llms.txt" href="/llms.txt">
+<link rel="canonical" href="https://github.com/Hasned-spec/ox402-utils">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231f5f5b'/%3E%3Ctext x='16' y='21' font-family='Georgia,serif' font-size='11' fill='%23fcfcfa' text-anchor='middle'%3E402%3C/text%3E%3C/svg%3E">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:"Georgia",serif;background:#fcfcfa;color:#1c1e21;line-height:1.6;font-size:16px;-webkit-font-smoothing:antialiased}
+.mono,.mono pre,.mono code,.mono td.num{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.wrap{max-width:960px;margin:0 auto;padding:0 24px}
+a{color:#1f5f5b;text-decoration:none;border-bottom:1px solid #d8d2c4}
+a:hover{border-bottom-color:#1f5f5b}
+h1,h2,h3,h4{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:#14161a;letter-spacing:-.01em}
+p{margin:0 0 14px}
+hr{border:0;border-top:1px solid #e6e2d7;margin:34px 0}
+header{border-bottom:1px solid #e6e2d7;background:#fff;position:sticky;top:0;z-index:5}
+.hrow{display:flex;align-items:center;gap:28px;height:58px}
+.logo{font-weight:700;font-size:17px;letter-spacing:-.02em;border-bottom:none;color:#14161a}
+.logo span{color:#8a8577;font-weight:400}
+nav{display:flex;gap:20px;font-size:13.5px;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif}
+nav a{color:#55503f;border-bottom:none}
+nav a:hover{color:#14161a}
+.spacer{flex:1}
+.hcta{font-size:13px;color:#55503f;border-bottom:none}
+.live{font:600 12px/1 "Helvetica Neue",Helvetica,Arial,sans-serif;color:#1f7a52;display:flex;align-items:center;gap:5px}
+.live:before{content:"";width:7px;height:7px;border-radius:50%;background:#2fa968;box-shadow:0 0 0 3px rgba(47,169,104,.18)}
+.live.down{color:#a9442f}.live.down:before{background:#c0492f;box-shadow:0 0 0 3px rgba(192,73,47,.18)}
+@media(max-width:640px){nav{display:none}}
+.intro{padding:46px 0 4px;max-width:700px}
+.intro h1{font-size:31px;line-height:1.22;margin-bottom:14px;font-weight:700}
+.intro p.lede{font-size:17.5px;color:#45423a;margin-bottom:10px}
+.intro p.sub{font-size:14px;color:#75705f}
+.facts{display:flex;gap:26px;flex-wrap:wrap;margin:18px 0 4px;font-size:13.5px;color:#45423a;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif}
+.facts b{display:block;font-size:19px;color:#14161a;font-weight:700;letter-spacing:-.02em}
+.facts span{color:#8a8577;font-size:12px}
+.cta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:16px;padding:12px 14px;background:#f4f2ea;border:1px solid #e6e2d7;border-radius:8px;font-size:13px}
+.cta-label{color:#45423a}.cta-label b{color:#1f5f5b}
+.cta code{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#fff;border:1px solid #cfcbc0;border-radius:4px;padding:5px 8px;color:#1c1e21;flex:1;min-width:200px;overflow-x:auto;white-space:nowrap}
+section{padding:30px 0}
+section>h2{font-size:19px;margin-bottom:4px;font-weight:600}
+section>p.desc{color:#5d5949;font-size:14px;margin-bottom:18px;max-width:660px}
+pre{background:#14161a;color:#d8e5df;border-radius:6px;padding:14px 16px;font-size:12.5px;line-height:1.55;overflow-x:auto;margin:12px 0}
+pre code{font-family:ui-monospace,Menlo,monospace}
+.copy{position:relative}
+.copybtn{position:absolute;top:8px;right:8px;font:500 11px/1 "Helvetica Neue",sans-serif;background:#2c3e3a;color:#dfeee8;border:0;border-radius:4px;padding:5px 9px;cursor:pointer}
+.copybtn:hover{background:#1f5f5b}
+.steps{counter-reset:s;max-width:700px}
+.steps li{list-style:none;counter-increment:s;margin-bottom:13px;padding-left:34px;position:relative;font-size:15px}
+.steps li:before{content:counter(s);position:absolute;left:0;top:2px;width:22px;height:22px;border:1px solid #cfcbc0;border-radius:50%;font:600 12px/20px "Helvetica Neue",Helvetica,Arial,sans-serif;text-align:center;color:#55503f;background:#fff}
+/* two big path cards */
+.paths{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0}
+@media(max-width:720px){.paths{grid-template-columns:1fr}}
+.path{border:1px solid #e6e2d7;border-radius:10px;background:#fff;padding:18px 20px}
+.path h3{font-size:16px;margin-bottom:6px}
+.path .tag{font:600 11px/1 "Helvetica Neue",sans-serif;text-transform:uppercase;letter-spacing:.05em;color:#1f5f5b;display:block;margin-bottom:8px}
+.path ol{margin:0 0 10px;padding-left:18px}
+.path ol li{font-size:13.5px;margin-bottom:6px;color:#45423a}
+.path .mini{font-size:12.5px;color:#75705f;margin-top:8px}
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+input[type=search]{font-size:14px;padding:8px 12px;border:1px solid #cfcbc0;background:#fff;border-radius:999px;outline:none;width:240px}
+input[type=search]:focus{border-color:#1f5f5b}
+.chips{display:flex;gap:7px;flex-wrap:wrap}
+.chip{font:500 12.5px/1 "Helvetica Neue",Helvetica,Arial,sans-serif;border:1px solid #cfcbc0;background:#fff;color:#55503f;border-radius:999px;padding:6px 13px;cursor:pointer}
+.chip:hover{border-color:#8a8577}
+.chip.active{background:#205c57;border-color:#17453f;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:12px}
+.card{border:1px solid #e6e2d7;border-radius:8px;background:#fff;padding:13px 14px;display:flex;flex-direction:column;gap:6px;transition:border-color .12s,box-shadow .12s}
+.card:hover{border-color:#b9b3a3;box-shadow:0 2px 10px rgba(20,20,20,.05)}
+.card .top{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.card{cursor:pointer}
+.card .name{font:700 14px/1.2 "Helvetica Neue",Helvetica,Arial,sans-serif;color:#14161a}
+.card .price{font:600 13px/1 ui-monospace,Menlo,monospace;color:#1f5f5b;white-space:nowrap}
+.card .desc{font-size:12.8px;color:#5d5949;flex:1}
+.badges{display:flex;gap:5px;flex-wrap:wrap}
+.badge{font:500 10px/1 "Helvetica Neue",Helvetica,Arial,sans-serif;border-radius:99px;padding:2px 7px}
+.badge.permin{background:#eef4f1;color:#1f5f5b}
+.badge.neural{background:#f3eef8;color:#5b3a8a}
+.badge.paid{background:#fbf6e7;color:#8a6d1f}
+.empty{grid-column:1/-1;color:#8a8577;font-size:14px;padding:20px 0}
+.play{display:flex;flex-direction:column;gap:10px}
+.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+select,input[type=text]{font-size:14px;padding:7px 10px;border:1px solid #cfcbc0;background:#fff;color:#1c1e21;border-radius:3px;outline:none}
+select:focus,input:focus{border-color:#1f5f5b}
+button{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:13.5px;padding:7px 16px;background:#205c57;color:#fdfdfb;border:1px solid #17453f;border-radius:3px;cursor:pointer}
+button:hover{background:#17453f}
+button:disabled{opacity:.5;cursor:default}
+button.ghost{background:#fff;color:#1c1e21;border-color:#cfcbc0}
+button.ghost:hover{border-color:#8a8577}
+.hint{margin-left:auto;font-size:12.5px;color:#75705f}
+textarea#req{width:100%;min-height:110px;font-size:12.8px;line-height:1.5;padding:10px;border:1px solid #cfcbc0;border-radius:3px;background:#fff;color:#1c1e21;resize:vertical;outline:none}
+textarea#req:focus{border-color:#1f5f5b}
+.out{border:1px solid #e6e2d7;border-radius:4px;background:#fff;min-height:44px}
+.out-head{display:flex;align-items:center;gap:10px;padding:7px 12px;border-bottom:1px solid #efebdf;font:500 12px "Helvetica Neue",Helvetica,Arial,sans-serif;color:#75705f}
+.status{font-weight:700}
+.ok{color:#1f5f5b}.err{color:#8a3b2f}
+.out-body{padding:10px 12px;max-height:340px;overflow:auto;font-size:12.3px;line-height:1.5}
+.out-body img,.out-body audio,.out-body video{max-width:100%;margin:6px 0;display:block}
+.out-body pre{background:#f6f4ec;color:#333;margin:0;padding:10px}
+.limits{background:#f7f5ee;border:1px solid #e6e2d7;border-radius:8px;padding:20px 24px;max-width:740px}
+.limits ul{margin:6px 0 0}
+.limits li{margin-bottom:9px;font-size:14px;color:#45423a}
+.limits li b{color:#14161a}
+.faq{margin:14px 0 0}
+.faq details{border:1px solid #e6e2d7;border-radius:8px;padding:0 16px;margin-bottom:8px;background:#fff}
+.faq summary{font:600 14px "Helvetica Neue",sans-serif;padding:12px 0;cursor:pointer;color:#14161a}
+.faq details p{font-size:13.5px;color:#45423a;padding:0 0 12px}
+footer{border-top:1px solid #e6e2d7;padding:26px 0 40px;color:#8a8577;font-size:13px;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif}
+footer a{color:#55503f}
+.addr{word-break:break-all}
+.note{font-size:12.5px;color:#75705f;margin-top:8px}
+.needusdc{display:inline-flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.needusdc a{font:500 12px/1 "Helvetica Neue",sans-serif;background:#eef4f1;color:#1f5f5b;border:1px solid #cfe3da;border-radius:999px;padding:5px 11px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap hrow">
+    <a class="logo" href="/">ox402<span>&nbsp;/ utils</span></a>
+    <nav>
+      <a href="#start">Start</a>
+      <a href="#tools">Tools</a>
+      <a href="#playground">Try it</a>
+      <a href="#faq">FAQ</a>
+      <a href="#limits">Limits</a>
+    </nav>
+    <span class="spacer"></span>
+    <span class="live" id="live">● live</span>
+    <a class="hcta mono" href="/x402/catalog">catalog.json →</a>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="intro">
+    <h1>57 paid tools. One x402 handshake. Zero signup.</h1>
+    <p class="lede">ox402 is a self-serve utility grid for AI agents and builders — the things an agent
+       <b>can't</b> do inside its own sandbox: web research, security recon, <b>neural text-to-speech</b>,
+       speech, document + media conversion, full-page screenshots, and SSL/breach audits. Every call settles in
+       USDC on Base — no API key, no account, no subscription.</p>
+    <p class="sub" id="subline">Loading live catalog…</p>
+    <div class="facts">
+      <div><b id="fact-tools">—</b><span>paid tools</span></div>
+      <div><b>$0.001–$0.10</b><span>per call</span></div>
+      <div><b>Base USDC</b><span>x402 payment</span></div>
+    </div>
+    <div class="cta">
+      <span class="cta-label">First call is <b>$0.004</b> — try it:</span>
+      <code id="cta-cmd">x402 curl https://HOST/x402/paid/crypto-price -H 'Content-Type: application/json' -d '{"ids":"bitcoin,ethereum"}'</code>
+      <button class="ghost" id="cta-copy">Copy</button>
+    </div>
+  </div>
+
+  <hr>
+
+  <section id="start">
+    <h2>Start in 60 seconds</h2>
+    <p class="desc">Two ways in. <b>Agents</b> just get the MCP server. <b>Humans</b> install one CLI. Both pay per call — nothing is free, nothing needs a signup.</p>
+    <div class="paths">
+      <div class="path">
+        <span class="tag">For AI agents (MCP)</span>
+        <h3>One line, 57 tools</h3>
+        <ol>
+          <li>Add the block below to your agent's MCP config (Claude Desktop, Cursor, LangChain, any MCP client).</li>
+          <li>The agent sees all 57 tools and pays per call automatically — no keys, no signup.</li>
+          <li>Just ask it to use an ox402 tool. Payment + retry happen invisibly.</li>
+        </ol>
+        <div class="copy">
+          <button class="copybtn" data-copy="mcp">Copy</button>
+<pre><code>{
+  "mcpServers": {
+    "ox402-utils": {
+      "url": "https://HOST/mcp402/"
+    }
+  }
+}</code></pre>
+        </div>
+        <p class="mini">Streamable HTTP MCP. Works with any x402-capable wallet the agent holds.</p>
+      </div>
+      <div class="path">
+        <span class="tag">For humans (CLI)</span>
+        <h3>Three commands</h3>
+        <ol>
+          <li><code style="background:#eee;padding:1px 5px;border-radius:3px">npm i -g x402</code> — the official x402 fetch client.</li>
+          <li><code style="background:#eee;padding:1px 5px;border-radius:3px">export X402_PRIVATE_KEY=0x…</code> — any Base USDC wallet.</li>
+          <li>Run any tool — payment + retry happen automatically.</li>
+        </ol>
+        <div class="copy">
+          <button class="copybtn" data-copy="cli">Copy</button>
+<pre><code>x402 curl https://HOST/x402/paid/crypto-price \
+  -H 'Content-Type: application/json' -d '{"ids":"bitcoin,ethereum"}'</code></pre>
+        </div>
+        <p class="mini">Need USDC on Base?
+          <span class="needusdc">
+            <a href="https://coinbase.com/onramp" target="_blank" rel="noopener">Coinbase Onramp</a>
+            <a href="https://faucet.circle.com" target="_blank" rel="noopener">Circle USDC faucet</a>
+            <a href="https://www.binance.com/en" target="_blank" rel="noopener">Buy USDC</a>
+          </span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <section id="quickstart">
+    <h2>How a call works</h2>
+    <p class="desc">Standard x402. If you've called a paid endpoint before, you already know the dance.</p>
+    <ol class="steps">
+      <li>Call the endpoint. It answers <span class="mono">402</span> with a payment request.</li>
+      <li>Your wallet (or the Coinbase facilitator) signs a USDC transfer for the exact amount.</li>
+      <li>Retry with the <span class="mono">X-PAYMENT</span> header. We verify, run the tool, settle on-chain.</li>
+    </ol>
+<div class="copy"><button class="copybtn" data-copy="curl2">Copy</button><pre><code># POST with x402 payment (X-PAYMENT header from the 402 handshake):
+curl -s https://HOST/x402/paid/crypto-price \
+  -H 'Content-Type: application/json' \
+  -d '{"ids":"bitcoin,ethereum"}'
+
+# GET /x402/catalog → every tool with price, schema, sample body.
+# MCP (streamable HTTP) at /mcp402/ for agent frameworks (Claude, LangChain, …).</code></pre></div>
+  </section>
+
+  <hr>
+
+  <section id="tools">
+    <h2>The catalog</h2>
+    <p class="desc">Live from <span class="mono">GET /x402/catalog</span> — rendered here, so prices are never stale.
+       Every call requires an x402 USDC payment (no free tier). Search or tap a category to narrow it down.</p>
+    <div class="bar">
+      <input type="search" id="q" placeholder="search tools…">
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="grid" id="grid"><div class="empty">loading…</div></div>
+  </section>
+
+  <hr>
+
+  <section id="playground">
+    <h2>Try a tool</h2>
+    <p class="desc">Pick a tool, hit <b>Run</b>. With no wallet attached it returns a friendly <span class="mono">402</span> with the exact command to copy and pay. Attach a wallet (via the x402 CLI or MCP) and the same call just works.
+      Agents: add the MCP server above and skip this entirely.</p>
+    <div class="play">
+      <div class="controls">
+        <select id="tool"><option value="">loading…</option></select>
+        <button id="run">Run (agent-style)</button>
+        <button class="ghost" id="reset">Reset body</button>
+        <button class="ghost" id="copycurl">Copy curl</button>
+        <span class="hint" id="price"></span>
+      </div>
+      <textarea id="req" spellcheck="false"></textarea>
+      <div class="out" id="out" hidden>
+        <div class="out-head"><span class="status mono" id="status"></span><span id="meta"></span></div>
+        <div class="out-body mono" id="outbody"></div>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <section id="faq">
+    <h2>Questions, answered</h2>
+    <div class="faq">
+      <details>
+        <summary>Do I need an account or API key?</summary>
+        <p>No. There is no signup. You pay per call directly from a Base USDC wallet via the x402 protocol. No API key is ever issued.</p>
+      </details>
+      <details>
+        <summary>Is there a free tier?</summary>
+        <p>No free trial by design — every call requires a payment. This keeps pricing honest and stops abuse. The first call is about $0.004, so trying one tool costs less than a cent.</p>
+      </details>
+      <details>
+        <summary>I'm a human, not an agent. Can I use this?</summary>
+        <p>Yes — install the one-line <code>x402</code> CLI, set a Base USDC wallet key, and run any tool. The "For humans" card above has the exact commands. Use the Buy USDC links if you need funds.</p>
+      </details>
+      <details>
+        <summary>How do I add it to my AI agent?</summary>
+        <p>Copy the MCP block in the "Start" card into your agent's MCP config. The agent gets all 57 tools and pays automatically per call. No code changes.</p>
+      </details>
+      <details>
+        <summary>Which wallet / network?</summary>
+        <p>USDC on Base mainnet (eip155:8453). Any x402-compatible payer works — the Coinbase x402 facilitator, a self-custody EVM wallet, or your agent's own wallet.</p>
+      </details>
+      <details>
+        <summary>Is my data safe?</summary>
+        <p>Browser captures run in a throwaway Chromium profile with no saved logins and private-IP access blocked. Uploads are parsed in memory and never executed or retained. Nothing you send is stored after the call.</p>
+      </details>
+    </div>
+  </section>
+
+  <hr>
+
+  <section id="limits">
+    <h2>Limits, stated plainly</h2>
+    <p class="desc">Every service has constraints. Here are ours, so your agent doesn't discover them the expensive way.</p>
+    <div class="limits">
+      <ul>
+        <li><b>No free trial.</b> Every call requires an x402 USDC payment — there is no unmetered path. This keeps the service honest about cost and stops abuse.</li>
+        <li><b>Speech & video bill per started minute.</b> STT $0.006/min (whisper-large-v3) or $0.002/min (whisper-tiny). TTS is <b>neural Kokoro-82M</b> at $0.004 / 1k chars (30+ English voices, runs offline on CPU). video2mp3 / video-download bill ~$0.0004 per minute of source — far cheaper than a flat fee, and there's no file-size cap.</li>
+        <li><b>Platform downloads:</b> YouTube and Vimeo block anonymous downloads from datacenter IPs. TikTok/X/Reddit/direct media URLs work. We say which failed and why instead of pretending.</li>
+        <li><b>Everything runs on-CPU.</b> No NVIDIA/cloud generative models. STT uses Groq's Whisper; TTS, images, PDFs and the whole utility pack are fully offline. No upstream outages or surprise throttling.</li>
+        <li><b>Browser captures are fully isolated.</b> Screenshots/PDFs run in a fresh, throwaway Chromium profile every call — no saved logins, cookies, or extensions persist, and the renderer is blocked from reaching private/loopback addresses (127.0.0.1, 10.x, 192.168.x, etc.). It can only fetch the public URL you give it. Nothing you send is ever stored.</li>
+        <li><b>Uploads are never executed.</b> file-scan, strip-metadata and image tools parse your bytes in memory and return a result; no file you upload is run, and inputs are not retained after the call.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap" style="padding:0">
+      <p>ox402-utils · pay-to address <span class="addr mono">0x7869d1fe2d1de863b6fae4594d392343a69ed8e3</span> · Base mainnet USDC</p>
+      <p><a href="/x402/catalog">/x402/catalog</a> · <a href="/x402/health">/x402/health</a> · <a href="/llms.txt">llms.txt</a> · <a href="/api.txt">api.txt</a> · <a href="/mcp402/">MCP server</a> · x402 discovery at <span class="mono">/.well-known/x402</span></p>
+      <p>All calls settle in USDC on Base via x402 — no subscription, no free tier. MCP (streamable HTTP) at <span class="mono">/mcp402/</span> for agent frameworks.</p>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+const CATS = [
+  ['Research & web intelligence', ['search','html2md','web-scrape','extract-structured','whois','dns-lookup','deep-search','research-brief','citations','fact-check','trend-watch','web-archive']],
+  ['Documents & media', ['pdf-extract','ocr','md2pdf','pdf-invoice','video-info','video-download','video2mp3','image-optimize','image-compress','capture-page','screenshot-mobile','pdf-merge']],
+  ['Speech', ['stt','stt-fast','tts','tts-voices']],
+  ['Security & recon', ['link-scan','file-scan','security-headers','cors-check','cookie-flags','dns-recon','port-scan','leak-check','subdomain-find','threat-intel','site-report','strip-metadata','email-verify','reverse-dns','header-compare']],
+  ['Finance & world data', ['crypto-price','stock-quote','fx-rates','weather','geoip']],
+  ['Dev & data utilities', ['http-headers','ssl-check','exec-python','repo2context','md-compress','temp-webhook','robots','sitemap','link-health']],
+];
+let TOOLS = {};
+let activeCat = null;
+
+function fmt(n){ return '$' + Number(n).toFixed(4).replace(/0+$/,'').replace(/\.$/,''); }
+function perMin(id){ return id==='stt'||id==='stt-fast'||id==='video2mp3'||id==='video-download'; }
+function isNeural(id){ return id==='tts'; }
+
+async function load(){
+  const live = document.getElementById('live');
+  document.querySelectorAll('code, pre').forEach(el => {
+    if(el.textContent.includes('HOST')) el.textContent = el.textContent.replace(/https:\/\/HOST/g, 'https://' + location.host);
+  });
+  const cta = document.getElementById('cta-cmd');
+  if(cta && cta.textContent.includes('HOST')) cta.textContent = cta.textContent.replace(/https:\/\/HOST/g, 'https://' + location.host);
+  try {
+    const d = await (await fetch('/x402/catalog')).json();
+    TOOLS = d.tools || {};
+    document.getElementById('fact-tools').textContent = d.tool_count;
+    document.getElementById('subline').textContent =
+      `${d.tool_count} tools live · ${fmt(Math.min(...Object.values(TOOLS).map(t=>t.price)))} to ${fmt(Math.max(...Object.values(TOOLS).map(t=>t.price)))} per call · settle in USDC on Base`;
+    renderChips(); renderGrid(); renderSelect();
+    try {
+      const h = await fetch('/x402/health');
+      if(h.ok){ live.textContent='● live'; live.className='live'; }
+      else { live.textContent='● degraded'; live.className='live down'; }
+    } catch(e){ live.textContent='● offline'; live.className='live down'; }
+  } catch(e){
+    document.getElementById('subline').textContent = 'Catalog temporarily unreachable — endpoints still up.';
+    live.textContent='● status unknown'; live.className='live down';
+  }
+}
+
+function renderChips(){
+  const c = document.getElementById('chips');
+  let h = `<span class="chip ${activeCat===null?'active':''}" data-cat="">All</span>`;
+  for(const [name] of CATS) h += `<span class="chip ${activeCat===name?'active':''}" data-cat="${name}">${name}</span>`;
+  c.innerHTML = h;
+  c.querySelectorAll('.chip').forEach(ch => ch.onclick = () => { activeCat = ch.dataset.cat || null; renderChips(); renderGrid(); });
+}
+
+function renderGrid(filt=''){
+  const grid = document.getElementById('grid');
+  const f = filt.toLowerCase();
+  let html = '';
+  for(const [catName, ids] of CATS){
+    if(activeCat && activeCat !== catName) continue;
+    const rows = ids.filter(id => TOOLS[id]).filter(id =>
+      !f || id.includes(f) || (TOOLS[id].desc||'').toLowerCase().includes(f));
+    if(!rows.length) continue;
+    if(!f) html += `<div class="empty" style="font:600 12px 'Helvetica Neue',sans-serif;color:#1f5f5b;letter-spacing:.06em;text-transform:uppercase;padding:4px 0 2px">${catName}</div>`;
+    for(const id of rows){
+      const t = TOOLS[id];
+      let badges = '';
+      if(perMin(id)) badges += '<span class="badge permin">/min</span>';
+      if(isNeural(id)) badges += '<span class="badge neural">neural</span>';
+      if(t.tier === 'paid') badges += '<span class="badge paid">paid</span>';
+      const priceTxt = perMin(id) ? fmt(t.price).replace(/$/,'').replace(/0+$/,'').replace(/\.$/,'') + '/min*' : fmt(t.price);
+      html += `<div class="card" data-id="${id}" role="button" tabindex="0" title="click to try ${id}"><div class="top"><span class="name">${id}</span><span class="price">${priceTxt}</span></div>` +
+              `<div class="desc">${(t.desc||'').replace(/^Cost ~?\$[\d.]+ ?(\/call)?\.? ?/i,'')}</div>` +
+              (badges ? `<div class="badges">${badges}</div>` : '') + `</div>`;
+    }
+  }
+  grid.innerHTML = html || '<div class="empty">no match</div>';
+  grid.querySelectorAll('.card[data-id]').forEach(c => {
+    c.onclick = () => { document.getElementById('tool').value = c.dataset.id; syncBody(); document.getElementById('playground').scrollIntoView({behavior:'smooth'}); };
+    c.onkeydown = e => { if(e.key==='Enter'){ c.click(); } };
+  });
+}
+
+function renderSelect(){
+  const sel = document.getElementById('tool');
+  sel.innerHTML = Object.keys(TOOLS).sort().map(k=>`<option>${k}</option>`).join('');
+  sel.value = 'crypto-price';
+  syncBody();
+  sel.onchange = () => { syncBody(); hideOut(); };
+}
+function syncBody(){
+  const t = document.getElementById('tool').value;
+  if(!TOOLS[t]) return;
+  document.getElementById('req').value = JSON.stringify(TOOLS[t].sample, null, 2);
+  document.getElementById('price').textContent = `${fmt(TOOLS[t].price)}${perMin(t)?' / started min':''}`;
+}
+function hideOut(){ document.getElementById('out').hidden = true; }
+
+function renderResult(d, status){
+  const out = document.getElementById('out');
+  const st = document.getElementById('status');
+  const ob = document.getElementById('outbody');
+  st.textContent = status;
+  st.className = 'status mono ' + (status.startsWith('2') ? 'ok' : 'err');
+  document.getElementById('meta').textContent = d.payer ? `paid by ${String(d.payer).slice(0,10)}…` : '';
+  const res = d.result !== undefined ? d.result : d;
+  ob.innerHTML = '';
+  if(status === '402'){
+    const tool = document.getElementById('tool').value;
+    const curl = `x402 curl https://${location.host}/x402/paid/${tool} \\\n  -H 'Content-Type: application/json' -d '${document.getElementById('req').value.replace(/'/g,"\\'")}'`;
+    const box = document.createElement('div');
+    box.innerHTML = `<p style="margin:0 0 8px"><b>This tool needs an x402 payment.</b> No wallet was attached, so nothing was charged. To actually run it:</p>` +
+      `<p style="margin:0 0 6px;font-size:12px;color:#5d5949">Install a client once: <code style="background:#eee;padding:1px 5px;border-radius:3px">npm i -g x402</code>, set <code style="background:#eee;padding:1px 5px;border-radius:3px">X402_PRIVATE_KEY</code>, then:</p>`;
+    const pre = document.createElement('pre'); pre.style.margin='0'; pre.textContent = curl;
+    box.appendChild(pre);
+    const cp = document.createElement('button'); cp.textContent='Copy this command'; cp.className='ghost'; cp.style.marginTop='8px';
+    cp.onclick = () => { navigator.clipboard.writeText(curl.replace(/\\\n\s*/g,' ')); cp.textContent='Copied ✓'; };
+    box.appendChild(cp);
+    ob.appendChild(box);
+    out.hidden = false; return;
+  }
+  const pick = (k) => res && res[k];
+  if(pick('data_url')){
+    const du = String(res.data_url);
+    if(du.startsWith('data:image')){ const im=document.createElement('img'); im.src=du; ob.appendChild(im); }
+    else if(du.startsWith('data:audio')){ const a=document.createElement('audio'); a.src=du; a.controls=true; ob.appendChild(a); }
+    else if(du.startsWith('data:video')){ const v=document.createElement('video'); v.src=du; v.controls=true; ob.appendChild(v); }
+    else if(du.startsWith('data:application/pdf')){ const a=document.createElement('a'); a.href=du; a.download=(res.format||'doc')+'.pdf'; a.textContent='download PDF ('+(res.bytes||'?')+' bytes)'; ob.appendChild(a); }
+  }
+  const strip = {...res}; delete strip.data_url; delete strip.context;
+  const txt = JSON.stringify(res.context ? {...strip, context:`(${res.context.length} chars)`} : strip, null, 2);
+  const pre = document.createElement('pre'); pre.textContent = txt.length > 8000 ? txt.slice(0,8000) + '\n… truncated' : txt;
+  ob.appendChild(pre);
+  out.hidden = false;
+}
+
+// copy buttons
+function copyText(t){ navigator.clipboard.writeText(t); }
+document.querySelectorAll('.copybtn').forEach(b => {
+  b.onclick = () => {
+    const sel = b.dataset.copy;
+    let txt = '';
+    if(sel==='mcp') txt = `{\n  "mcpServers": {\n    "ox402-utils": {\n      "url": "https://${location.host}/mcp402/"\n    }\n  }\n}`;
+    else if(sel==='cli') txt = `x402 curl https://${location.host}/x402/paid/crypto-price -H 'Content-Type: application/json' -d '{"ids":"bitcoin,ethereum"}'`;
+    else if(sel==='curl2') txt = `curl -s https://${location.host}/x402/paid/crypto-price -H 'Content-Type: application/json' -d '{"ids":"bitcoin,ethereum"}'`;
+    copyText(txt); b.textContent='Copied ✓'; setTimeout(()=>b.textContent='Copy',1500);
+  };
+});
+
+document.getElementById('copycurl').onclick = () => {
+  const tool = document.getElementById('tool').value;
+  const curl = `x402 curl https://${location.host}/x402/paid/${tool} -H 'Content-Type: application/json' -d '${document.getElementById('req').value.replace(/'/g,"\\'")}'`;
+  navigator.clipboard.writeText(curl);
+  const b = document.getElementById('copycurl'); b.textContent='Copied ✓'; setTimeout(()=>b.textContent='Copy curl',1500);
+};
+
+document.getElementById('run').onclick = async () => {
+  const btn = document.getElementById('run');
+  const t = document.getElementById('tool').value;
+  if(!t) return;
+  let body;
+  try { body = JSON.parse(document.getElementById('req').value); }
+  catch(e){ renderResult({error:'invalid JSON: '+e.message}, '400'); return; }
+  btn.disabled = true; btn.textContent = 'Running…';
+  try {
+    const r = await fetch('/x402/paid/'+t, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+    const d = await r.json().catch(()=>({error:'non-JSON response'}));
+    renderResult(d, String(r.status));
+  } catch(e){ renderResult({error:'network error: '+e.message}, 'ERR'); }
+  btn.disabled = false; btn.textContent = 'Run';
+};
+document.getElementById('reset').onclick = () => { syncBody(); hideOut(); };
+document.getElementById('q').oninput = e => renderGrid(e.target.value);
+
+document.getElementById('cta-copy').onclick = () => {
+  navigator.clipboard.writeText(document.getElementById('cta-cmd').textContent);
+  const b=document.getElementById('cta-copy'); b.textContent='Copied ✓'; setTimeout(()=>b.textContent='Copy',1500);
+};
+load();
+</script>
+</body>
+</html>
