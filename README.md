@@ -10,6 +10,37 @@ No accounts, no API keys, no subscription.
 
 ---
 
+
+## Quick Start (Agent SDK)
+
+Copy-paste this into your agent to call any tool via x402 (USDC on Base):
+
+```python
+import httpx, os
+
+BASE = os.getenv("OX402_BASE", "https://deviant-oils-guardian-coating.trycloudflare.com/x402")
+WALLET = os.getenv("WALLET_ADDRESS")  # 0x... your wallet (optional for free trial)
+
+async def call(tool: str, payload: dict):
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        r = await client.post(f"{BASE}/trial/{tool}", json=payload)
+        if r.status_code == 200:
+            return r.json()
+        if r.status_code == 402:
+            # payment required - pay with x402 facilitator
+            pay = r.json()
+            # (integrate with x402 facilitator / wallet here)
+            raise RuntimeError(f"Paid tool {tool}: {pay['amount']} USDC")
+        r.raise_for_status()
+
+# Free trial (10 calls/IP on tier=free tools)
+print(await call("search", {"query": "x402 protocol", "count": 5}))
+# Paid tool example
+# print(await call("stt", {"url": "https://example.com/audio.mp3"}))
+```
+
+For production: swap `/trial/` -> `/paid/` and use the x402 facilitator to settle USDC on Base.
+
 ## Why this exists
 
 An AI agent's sandbox can't open a browser, run a neural TTS model, scan a host for open ports,
