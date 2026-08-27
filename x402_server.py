@@ -180,8 +180,36 @@ def public_base_url(headers=None):
         return f'https://{host}'
     return 'http://129.213.128.185'
 
+# ---- free trial ledger: N free calls per IP, persisted so it survives restarts ----
+FREE_TRIAL_CALLS = 5
+_FREE_LEDGER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'free_trial.jsonl')
+
+def _load_free():
+    use = {}
+    try:
+        with open(_FREE_LEDGER) as f:
+            for line in f:
+                try:
+                    r = json.loads(line)
+                    use[r['ip']] = use.get(r['ip'], 0) + 1
+                except Exception:
+                    pass
+    except FileNotFoundError:
+        pass
+    return use
+
+_free_use = _load_free()
+
 def free_remaining(ip):
-    return max(0, FREE_PER_DAY - int(_free_use.get(ip, 0)))
+    return max(0, FREE_TRIAL_CALLS - int(_free_use.get(ip, 0)))
+
+def consume_free(ip):
+    _free_use[ip] = _free_use.get(ip, 0) + 1
+    try:
+        with open(_FREE_LEDGER, 'a') as f:
+            f.write(json.dumps({'t': time.time(), 'ip': ip}) + '\n')
+    except Exception:
+        pass
 
 def verify_x402(headers, tool):
     hdr = headers.get('X-Payment') or headers.get('x-payment')
@@ -256,7 +284,8 @@ class H(BaseHTTPRequestHandler):
             'outputSchema': {'input': {'type': 'http', 'method': 'POST',
                 'discoverable': True, 'bodyType': 'json', 'schema': schema,
                 'example': sample}},
-            'free_trial': None}
+            'free_trial': {'calls_per_ip': FREE_TRIAL_CALLS, 'tier': 'free',
+                           'note': 'First %d calls per IP are free on tier=free tools; paid-tier tools always require x402 USDC.' % FREE_TRIAL_CALLS}}
         b64 = base64.b64encode(json.dumps(chal).encode()).decode()
         self._send(402, chal, {'PAYMENT-REQUIRED': b64})
 
@@ -269,12 +298,27 @@ class H(BaseHTTPRequestHandler):
                                     'tool_count': len(TOOLS), 'address': W['address']})
         if self.path == '/.well-known/x402' or self.path.startswith('/.well-known/x402?'):
             resources = [f'POST /x402/paid/{k}' for k in TOOLS]
+            # CDP Bazaar discovery extension (per-resource metadata so agents can build valid calls)
+            bazaar = {
+                'version': 1,
+                'resources': [
+                    {
+                        'method': 'POST',
+                        'path': f'/x402/paid/{k}',
+                        'description': v[3],
+                        'price': f'${v[1]:.4f}'.rstrip('0').rstrip('.'),
+                        'inputSchema': {'type': 'object', 'properties': {}},
+                        'outputSchema': {'type': 'object'},
+                    } for k, v in TOOLS.items()
+                ],
+            }
             return self._send(200, {'version': 1, 'resources': resources,
                 'name': 'ox402-utils',
-                'description': 'High-friction paid tools for AI agents: research, docs/media, STT/TTS per-minute, security scans, agent utilities. x402 USDC on Base. No free trial — every call settles.',
+                'description': 'High-friction paid tools for AI agents: research, docs/media, STT/TTS per-minute, security scans, agent utilities. x402 USDC on Base. First 5 calls/IP free on tier=free tools.',
                 'payment': {'scheme': 'exact', 'network': NETWORK,
                     'asset': '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
-                    'payTo': W['address']}})
+                    'payTo': W['address']},
+                'extensions': {'bazaar': bazaar}})
         if self.path.startswith('/.well-known'):
             return self._send(200, {'name': 'ox402-utils', 'version': 4,
                 'description': 'Paid agent tools. x402 USDC on Base.',
@@ -284,7 +328,7 @@ class H(BaseHTTPRequestHandler):
             return self._send(200, {'service': 'ox402-utils', 'version': 4,
                 'tool_count': len(TOOLS), 'network': NETWORK, 'asset': 'USDC',
                 'pay_to': W['address'],
-                'free_trial': None,
+                'free_trial': {'calls_per_ip': FREE_TRIAL_CALLS, 'tier': 'free'},
                 'rate_limits': {'speech': '20 requests/min shared across stt/stt-fast/tts (all CPU)'},
                 'tools': {k: {'price': v[1], 'tier': v[2], 'desc': v[3], 'sample': v[4]} for k, v in TOOLS.items()},
                 'usage': 'POST /paid/<tool> JSON body; x402 402 handshake + X-PAYMENT header on every call'})
@@ -314,6 +358,24 @@ class H(BaseHTTPRequestHandler):
             return self._send(400, {'error': 'bad JSON body'})
         body.pop('_free', None)  # never trust client-supplied flags
 
+        # --- free trial gate: tier 'free' tools get FREE_TRIAL_CALLS free calls per IP ---
+        if tier == 'free' and free_remaining(_ip) > 0:
+            consume_free(_ip)
+            remaining = free_remaining(_ip)
+            try:
+                out = fn(body)
+            except ValueError as e:
+                return self._send(400, {'error': str(e)[:300]})
+            except Exception as e:
+                return self._send(500, {'error': 'tool error: ' + str(e)[:200]})
+            with open(os.path.join(os.path.dirname(__file__), 'x402_sales.jsonl'), 'a') as f:
+                f.write(json.dumps({'t': time.time(), 'tool': tool, 'tier': tier,
+                                    'payer': 'free-trial', 'ok': True,
+                                    'amount_usd': 0.0, 'amount': 0.0, 'free': True}) + '\n')
+            return self._send(200, {'result': out, 'payer': 'free-trial', 'settled': True,
+                                    'free_trial': True, 'free_calls_remaining': remaining,
+                                    'note': f'Free trial call. {remaining} free calls left on this IP, then x402 USDC payment.'})
+
         ok, payer, settle, err = verify_x402(self.headers, tool)
         if not ok and err and err.startswith('missing'):
             return self.challenge(tool)
@@ -336,5 +398,5 @@ class H(BaseHTTPRequestHandler):
         self._send(200, {'result': out, 'payer': payer, 'settled': st.get('success')})
 
 if __name__ == '__main__':
-    print(f"ox402 v4 on :{PORT} | tools={len(TOOLS)} | payTo={W['address']} | no free trial")
+    print(f"ox402 v4 on :{PORT} | tools={len(TOOLS)} | payTo={W['address']} | free trial: {FREE_TRIAL_CALLS} calls/IP on tier=free")
     ThreadingHTTPServer(('127.0.0.1', PORT), H).serve_forever()
