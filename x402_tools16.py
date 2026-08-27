@@ -68,6 +68,26 @@ def tool_ai_text(params):
                        "note": "Generated via Pollinations (free LLM)."}}
 
 # ---------- AI rewriter / humanizer ----------
+def _local_rewrite(text, style):
+    """Heuristic rewrite that always works offline: simplifies inflated phrasing."""
+    import re as _re
+    swaps = [
+        (r'\butilize\b', 'use'), (r'\bleverage\b', 'use'), (r'\bsynergistic\b', 'combined'),
+        (r'\bparadigm\b', 'approach'), (r'\bfacilitate\b', 'help'), (r'\bimplement\b', 'build'),
+        (r'\bmethodology\b', 'method'), (r'\boptimize\b', 'improve'), (r'\bfunctionality\b', 'feature'),
+        (r'\badditional\b', 'more'), (r'\bapproximately\b', 'about'), (r'\bprior to\b', 'before'),
+        (r'\bin order to\b', 'to'), (r'\ba sufficient number of\b', 'enough'),
+        (r'\bwith regard to\b', 'about'), (r'\bcommence\b', 'start'), (r'\bterminate\b', 'end'),
+    ]
+    out = text
+    for pat, rep in swaps:
+        out = _re.sub(pat, rep, out, flags=_re.I)
+    # break long sentences
+    out = _re.sub(r'; ', '. ', out)
+    if style and 'casual' in style.lower():
+        out = out[0].lower() + out[1:] if out else out
+    return out
+
 def tool_ai_rewrite(params):
     text = (params.get("text") or "").strip()
     if not text:
@@ -76,12 +96,35 @@ def tool_ai_rewrite(params):
         text = text[:3000]
     style = params.get("style", "natural, human, fluent")
     q = "Rewrite the following text to sound %s. Keep meaning and facts. Only return the rewritten text:\n\n%s" % (style, text)
-    r = _http_get(POLLINATIONS_TXT + urllib.parse.quote(q), timeout=60)
-    if r.status_code != 200:
-        return {"error": "rewrite failed: %d" % r.status_code}
-    return {"result": {"rewritten": r.text.strip(), "style": style}}
+    # try Pollinations POST first
+    try:
+        r = requests.post(POLLINATIONS_TXT, data=json.dumps({"messages": [{"role": "user", "content": q}]}),
+                          timeout=45, headers={"Content-Type": "application/json"})
+        if r.status_code == 200 and r.text.strip():
+            return {"result": {"rewritten": r.text.strip(), "style": style, "engine": "pollinations"}}
+    except Exception:
+        pass
+    # fallback: local heuristic rewrite (always works)
+    return {"result": {"rewritten": _local_rewrite(text, style), "style": style, "engine": "local-heuristic",
+                       "note": "LLM unavailable; applied offline simplification."}}
 
 # ---------- AI summarizer ----------
+def _local_summarize(text, max_points=5):
+    """Extractive summary: split into sentences, score by word frequency, return top sentences."""
+    import re as _re
+    from collections import Counter
+    sentences = _re.split(r'(?<=[.!?])\s+', text.strip())
+    sentences = [s for s in sentences if len(s) > 20]
+    if not sentences:
+        return text[:300]
+    words = _re.findall(r'\b[a-z]{4,}\b', text.lower())
+    stop = set('that with this from have will your their about would could should these those'.split())
+    freq = Counter(w for w in words if w not in stop)
+    scored = sorted(sentences, key=lambda s: sum(freq.get(w,0) for w in _re.findall(r'\b[a-z]{4,}\b', s.lower())), reverse=True)
+    top = scored[:max_points]
+    # restore original order
+    return "\n".join(s for s in sentences if s in top)
+
 def tool_ai_summarize(params):
     text = (params.get("text") or params.get("url") or "").strip()
     if not text:
@@ -89,10 +132,16 @@ def tool_ai_summarize(params):
     if len(text) > 5000:
         text = text[:5000]
     q = "Summarize the following in 3-5 concise bullet points. Return only the bullets:\n\n%s" % text
-    r = _http_get(POLLINATIONS_TXT + urllib.parse.quote(q), timeout=60)
-    if r.status_code != 200:
-        return {"error": "summarize failed: %d" % r.status_code}
-    return {"result": {"summary": r.text.strip(), "chars_in": len(text)}}
+    try:
+        r = requests.post(POLLINATIONS_TXT, data=json.dumps({"messages": [{"role": "user", "content": q}]}),
+                          timeout=45, headers={"Content-Type": "application/json"})
+        if r.status_code == 200 and r.text.strip():
+            return {"result": {"summary": r.text.strip(), "chars_in": len(text), "engine": "pollinations"}}
+    except Exception:
+        pass
+    # fallback: local extractive summary
+    return {"result": {"summary": _local_summarize(text), "chars_in": len(text), "engine": "local-extractive",
+                       "note": "LLM unavailable; applied offline extractive summary."}}
 
 # ---------- Translation ----------
 def tool_translate(params):
