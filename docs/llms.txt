@@ -2,6 +2,7 @@
 
 87 paid tools for AI agents and humans, payable per call via x402 (USDC on Base).
 Base URL: https://deviant-oils-guardian-coating.trycloudflare.com
+- Stable IP (never rotates): http://129.213.128.185 (use /x402/paid/<tool> or /x402/trial/<tool>)
 
 - Free trial: first 10 calls per IP on tier=free tools (no wallet, no signup).
 - Paid-tier tools: x402 USDC on Base (eip155:8453). MCP server: /mcp402/
