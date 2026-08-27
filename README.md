@@ -5,7 +5,7 @@ Web research, security recon, **neural text-to-speech (Kokoro-82M)**, speech, do
 conversion, full-page screenshots, AI image/text, resume parsing, and SSL/breach audits.
 No accounts, no API keys, no subscription.
 
-> **Live site:** https://section-border-coding-piano.trycloudflare.com (tunnel rotates — the current URL is always in `docs/api.txt` and `/.well-known/x402`).
+> **Live site:** https://deviant-oils-guardian-coating.trycloudflare.com (tunnel rotates — the current URL is always in `docs/api.txt` and `/.well-known/x402`).
 > MCP server: **`/mcp402/`** · Catalog: **`/x402/catalog`** · Machine-readable: **`/llms.txt`** · Agent manifest: **`/.well-known/ai-plugin.json`**
 
 ---
@@ -25,14 +25,14 @@ via `POST /x402/trial/<tool>`. Paid-tier tools always require an x402 USDC payme
 
 **Free trial call (no payment):**
 ```bash
-curl -s https://section-border-coding-piano.trycloudflare.com/x402/trial/search \
+curl -s https://deviant-oils-guardian-coating.trycloudflare.com/x402/trial/search \
   -H 'Content-Type: application/json' \
   -d '{"query":"x402 protocol","count":3}'
 ```
 
 **Paid call (x402 handshake):**
 ```bash
-curl -i https://section-border-coding-piano.trycloudflare.com/x402/paid/search \
+curl -i https://deviant-oils-guardian-coating.trycloudflare.com/x402/paid/search \
   -H 'Content-Type: application/json' \
   -d '{"query":"x402 protocol","count":3}'
 ```
@@ -46,7 +46,7 @@ Verified via the CDP facilitator; settled on-chain.
 ```json
 {
   "mcpServers": {
-    "ox402-utils": { "url": "https://section-border-coding-piano.trycloudflare.com/mcp402/" }
+    "ox402-utils": { "url": "https://deviant-oils-guardian-coating.trycloudflare.com/mcp402/" }
   }
 }
 ```
