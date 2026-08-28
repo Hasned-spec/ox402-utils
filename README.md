@@ -1,76 +1,45 @@
 # ox402-utils
 
-**87 paid tools for AI agents and humans — payable per call via x402 (USDC on Base).**
+**94 capability APIs an AI agent can't run in its own sandbox — paid per call via x402 (USDC on Base).**
 Web research, security recon, **neural text-to-speech (Kokoro-82M)**, speech, document + media
-conversion, full-page screenshots, AI image/text, resume parsing, and SSL/breach audits.
-No accounts, no API keys, no subscription.
+conversion, full-page screenshots, SSL/breach audits, SQL sandboxes, embeddings, and more.
+No accounts, no API keys, no subscription. **Free trial: 10 calls/IP on tier=free tools.**
 
-> **Live site:** https://deviant-oils-guardian-coating.trycloudflare.com (tunnel rotates — the current URL is always in `docs/api.txt` and `/.well-known/x402`).
-> MCP server: **`/mcp402/`** · Catalog: **`/x402/catalog`** · Machine-readable: **`/llms.txt`** · Agent manifest: **`/.well-known/ai-plugin.json`**
+[![Hasned-spec/ox402-utils MCP server](https://glama.ai/mcp/servers/Hasned-spec/ox402-utils/badges/score.svg)](https://glama.ai/mcp/servers/Hasned-spec/ox402-utils)
+
+> Live site: **the current tunnel URL is published in `api.txt` and `/.well-known/x402` on this repo's served docs, and rotates periodically — fetch `api.txt` for the live endpoint.**
+> MCP server: **`/mcp402/`** · Catalog: **`/x402/catalog`** · Machine-readable: **`/llms.txt`**
 
 ---
 
-
-## Quick Start (Agent SDK)
-
-Copy-paste this into your agent to call any tool via x402 (USDC on Base):
-
-```python
-import httpx, os
-
-BASE = os.getenv("OX402_BASE", "https://deviant-oils-guardian-coating.trycloudflare.com/x402")
-WALLET = os.getenv("WALLET_ADDRESS")  # 0x... your wallet (optional for free trial)
-
-async def call(tool: str, payload: dict):
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        r = await client.post(f"{BASE}/trial/{tool}", json=payload)
-        if r.status_code == 200:
-            return r.json()
-        if r.status_code == 402:
-            # payment required - pay with x402 facilitator
-            pay = r.json()
-            # (integrate with x402 facilitator / wallet here)
-            raise RuntimeError(f"Paid tool {tool}: {pay['amount']} USDC")
-        r.raise_for_status()
-
-# Free trial (10 calls/IP on tier=free tools)
-print(await call("search", {"query": "x402 protocol", "count": 5}))
-# Paid tool example
-# print(await call("stt", {"url": "https://example.com/audio.mp3"}))
-```
-
-For production: swap `/trial/` -> `/paid/` and use the x402 facilitator to settle USDC on Base.
-
 ## Why this exists
 
-An AI agent's sandbox can't open a browser, run a neural TTS model, scan a host for open ports,
+An AI agent's sandbox can't open a browser, run a GPU TTS model, scan a host for open ports,
 or audit a site's TLS. ox402 does those for it — and bills per call in USDC. No signup, no
 API key, no monthly minimum. Every call is authorized by an on-chain micropayment
 ([x402](https://www.x402.org)): hit the endpoint, get a `402` challenge, pay the exact amount,
 retry with the `X-Payment` header.
 
-**Free trial:** the first **5 calls per IP** on tier=`free` tools run free — no wallet, no signup —
-via `POST /x402/trial/<tool>`. Paid-tier tools always require an x402 USDC payment.
+**Free trial: 10 calls/IP on tier=free tools.** Paid-tier tools always require x402 USDC.
 
-## Use it in 30 seconds
+## Use it in 30 seconds (curl)
 
-**Free trial call (no payment):**
 ```bash
-curl -s https://deviant-oils-guardian-coating.trycloudflare.com/x402/trial/search \
+# Free trial (10 calls/IP): no payment needed
+curl -X POST https://deviant-oils-guardian-coating.trycloudflare.com/x402/trial/search \
   -H 'Content-Type: application/json' \
   -d '{"query":"x402 protocol","count":3}'
-```
 
-**Paid call (x402 handshake):**
-```bash
+# Paid tier: POST -> 402 challenge -> pay -> retry with X-Payment header
 curl -i https://deviant-oils-guardian-coating.trycloudflare.com/x402/paid/search \
   -H 'Content-Type: application/json' \
   -d '{"query":"x402 protocol","count":3}'
 ```
+
 The `402` response carries a `PAYMENT-REQUIRED` challenge with the exact USDC amount and the
 `payTo` address. Pay on Base, then repeat the request with the signed payment in the
 `X-Payment` header (any x402 client: the Coinbase `x402` fetch wrapper, or your own signer).
-Verified via the CDP facilitator; settled on-chain.
+Verified + settled via our self-hosted facilitator (melonask/facilitator) on Base mainnet.
 
 ## MCP server (Claude / any MCP client)
 
@@ -81,48 +50,52 @@ Verified via the CDP facilitator; settled on-chain.
   }
 }
 ```
-`tools/list` is free and returns all 76 MCP-exposed tools. `tools/call` returns the payment
-instructions when unpaid. Drop it into Claude Desktop, Cursor, or any MCP framework and the
-agent can pay-to-use every tool.
 
-## What's inside (88 tools)
+`tools/list` is free and returns all 94 tools (compact ~1.6k-token menu; full schemas on
+demand). `tools/call` returns the payment instructions when unpaid. Drop it into Claude
+Desktop, Cursor, or any MCP framework and the agent can pay-to-use every tool.
+
+## What's inside (94 tools)
 
 | group | examples |
 |-------|----------|
-| Research & web | `search`, `html2md`, `web-scrape`, `extract-structured`, `deep-search`, `research-brief`, `citations`, `fact-check`, `web-archive` |
-| Documents & media | `pdf-extract`, `ocr`, `md2pdf`, `pdf-invoice`, `video-download`, `video2mp3`, `image-optimize`, `image-compress`, `capture-page` (full-page screenshot/PDF), `screenshot-mobile`, `pdf-merge` |
+| Research & web | `search`, `html2md`, `web-scrape`, `extract-structured`, `deep-search`, `research-brief`, `citations`, `fact-check`, `web-archive`, `openapi-fetch`, `graphql` |
+| Documents & media | `pdf-extract`, `ocr`, `md2pdf`, `pdf-invoice`, `video-download`, `video2mp3`, `image-optimize`, `image-compress`, `capture-page` (full-page screenshot/PDF), `screenshot-mobile`, `pdf-merge`, `pdf-compress` |
 | Speech | `stt` / `stt-fast` (Whisper), `tts` (**neural Kokoro-82M**, 30+ voices, $0.004/1k chars), `tts-voices` |
 | Security & recon | `security-headers`, `cors-check`, `cookie-flags`, `dns-recon`, `port-scan`, `leak-check`, `subdomain-find`, `threat-intel`, `site-report`, `file-scan`, `email-verify`, `reverse-dns`, `header-compare` |
-| AI (paid) | `ai-image`, `ai-rewrite`, `ai-summarize`, `ai-text`, `translate`, `resume-parse`, `pdf-to-word`, `plagiarism`, `qr`, `link-preview`, `pdf-compress`, `video-thumb` |
 | Finance & world | `crypto-price`, `stock-quote`, `fx-rates`, `weather`, `geoip` |
-| Dev & data | `http-headers`, `ssl-check`, `exec-python`, `repo2context`, `md-compress`, `temp-webhook`, `robots`, `sitemap`, `link-health` |
+| Dev & data | `http-headers`, `ssl-check`, `exec-python`, `repo2context`, `md-compress`, `temp-webhook`, `robots`, `sitemap`, `link-health`, `sqlite`, `embed`, `price-estimate`, `dry-run`, `batch` |
+| AI & text | `ai-text`, `ai-rewrite`, `ai-summarize`, `translate`, `resume-parse`, `pdf-to-word`, `plagiarism`, `qr`, `link-preview` |
 
-## Pricing (buyer-friendly, per call)
+## Pricing
 
-- Most tools **$0.001–$0.01**.
-- Speech & video **bill per started minute** — `stt` $0.006/min, `stt-fast` $0.002/min,
-  `video2mp3` / `video-download` ~$0.0004/min of source (no file-size cap).
-- Neural TTS `tts` $0.004 per 1k chars.
-- Range across all 88: **$0.001 to $0.10**.
-- **First 5 calls/IP free** on tier=`free` tools (via `/x402/trial/`).
+- **Free tier:** 10 calls/IP on all tier=free tools via `/x402/trial/<tool>` (no wallet, no signup)
+- **Paid tier:** $0.001 – $0.10 per call (avg $0.014), USDC on Base mainnet (chain 8453)
+- **Payee:** `0xE9C9cC258f7137fD0AbA4Ae513F0Cfa288c0cDc9`
 
-Full catalog with live prices: **`/x402/catalog`** (rendered on the live site).
+## Self-host
 
-## Safety & isolation (for you and for us)
+```bash
+git clone https://github.com/Hasned-spec/ox402-utils
+cd ox402-utils
+pip install -r requirements.txt
+python3 x402_server.py   # :8793
+```
 
-- **Browser captures run in a fresh, throwaway Chromium profile every call** — no saved
-  logins, cookies, or extensions persist, and the renderer is blocked from private/loopback
-  addresses (127.0.0.1, 10.x, 192.168.x, …). It can only fetch the public URL you give it.
-- **Uploads are never executed.** `file-scan`, `strip-metadata`, and image tools parse your
-  bytes in memory and return a result; inputs are not retained after the call.
-- Everything runs **on-CPU** (no NVIDIA/cloud generative models) — no upstream outages.
+Docker:
+
+```bash
+docker build -t ox402 .
+docker run -p 8793:8793 -p 8796:8796 ox402
+```
 
 ## Discovery
 
-- Agent-readable: **`/.well-known/x402`** (full endpoint manifest), **`/.well-known/ai-plugin.json`** (tool schemas), and **`/llms.txt`**.
-- Listed on the **402index** x402 service registry.
-- MCP server at **`/mcp402/`** (streamable HTTP).
+- **GitHub Pages:** https://hasned-spec.github.io/ox402-utils/
+- **402index:** https://402index.io (search "ox402")
+- **Glama:** https://glama.ai/mcp/servers/Hasned-spec/ox402-utils
+- **MCP:** `/mcp402/` on the live tunnel
 
----
+## License
 
-*Pay-to address `0x7869d1fe2d1de863b6fae4594d392343a69ed8e3` · Base mainnet USDC.*
+MIT
