@@ -17,7 +17,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY x402_server.py x402_tools.py x402_tools2.py x402_tools3.py x402_tools4.py x402_tools5.py x402_tools6.py x402_tools7.py x402_tools8.py x402_tools9.py x402_tools10.py x402_tools11.py x402_tools12.py x402_tools13.py x402_tools14.py x402_tools15.py x402_tools16.py x402_security.py mcp_server.py ./
+COPY x402_server.py x402_tools.py x402_tools2.py x402_tools3.py x402_tools4.py x402_tools5.py x402_tools6.py x402_tools7.py x402_tools8.py x402_tools9.py x402_tools10.py x402_tools11.py x402_tools12.py x402_tools13.py x402_tools14.py x402_tools15.py x402_tools16.py x402_tools17.py x402_security.py mcp_server.py ./
 
 # Environment
 ENV OX402_MCP_PORT=8796
