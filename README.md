@@ -26,12 +26,12 @@ retry with the `X-Payment` header.
 
 ```bash
 # Free trial (10 calls/IP): no payment needed
-curl -X POST https://deviant-oils-guardian-coating.trycloudflare.com/x402/trial/search \
+curl -X POST http://129.213.128.185/x402/trial/search \
   -H 'Content-Type: application/json' \
   -d '{"query":"x402 protocol","count":3}'
 
 # Paid tier: POST -> 402 challenge -> pay -> retry with X-Payment header
-curl -i https://deviant-oils-guardian-coating.trycloudflare.com/x402/paid/search \
+curl -i http://129.213.128.185/x402/paid/search \
   -H 'Content-Type: application/json' \
   -d '{"query":"x402 protocol","count":3}'
 ```
@@ -46,7 +46,7 @@ Verified + settled via our self-hosted facilitator (melonask/facilitator) on Bas
 ```json
 {
   "mcpServers": {
-    "ox402-utils": { "url": "https://deviant-oils-guardian-coating.trycloudflare.com/mcp402/" }
+    "ox402-utils": { "url": "http://129.213.128.185/mcp402/" }
   }
 }
 ```
