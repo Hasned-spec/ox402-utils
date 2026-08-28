@@ -2,9 +2,9 @@
 
 94 paid tools for AI agents and humans. x402 USDC on Base.
 
-MCP: http://129.213.128.185/mcp402/
-Catalog: http://129.213.128.185/x402/catalog
-Discovery: http://129.213.128.185/.well-known/x402
+MCP: https://joins-bush-morgan-systems.trycloudflare.com/mcp402/
+Catalog: https://joins-bush-morgan-systems.trycloudflare.com/x402/catalog
+Discovery: https://joins-bush-morgan-systems.trycloudflare.com/.well-known/x402
 
 ## Tools
 - search — Read-only web search (DuckDuckGo): title+url+snippet per result. Cost $0.008/call. (0.008)
