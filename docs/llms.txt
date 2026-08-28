@@ -1,6 +1,6 @@
 # ox402-utils
 
-87 paid tools for AI agents and humans. x402 USDC on Base.
+94 paid tools for AI agents and humans. x402 USDC on Base.
 
 MCP: https://deviant-oils-guardian-coating.trycloudflare.com/mcp402/
 Catalog: https://deviant-oils-guardian-coating.trycloudflare.com/x402/catalog
@@ -94,3 +94,10 @@ Discovery: https://deviant-oils-guardian-coating.trycloudflare.com/.well-known/x
 - link-preview — Link unfurl / preview card: Open Graph title+description+image for any URL (like a social embed). $0.01/call. (0.01)
 - pdf-compress — Shrink a PDF (re-pack pages, drop bloat). Email-friendly. $0.03/call. (0.03)
 - video-thumb — Extract a thumbnail frame from any video URL at a given timestamp (ffmpeg). $0.02/call. (0.02)
+- openapi-fetch — Fetch + parse OpenAPI/Swagger spec from URL, return endpoint summary. Agent API discovery. (0.008)
+- graphql — GraphQL introspection or query execution. Pass introspect=true for schema, or query+variables to run. (0.01)
+- sqlite — In-memory SQLite sandbox: run SQL on CSV data you provide. Read-only by default; allow_write=true for DML. (0.01)
+- embed — Local embeddings (BAAI/bge-small) + optional similarity search against provided docs. CPU, no API. (0.01)
+- price-estimate — Cost estimator: pass calls [{tool, count}] -> USD total + free-trial breakdown. No charge, helps agents budget. (0)
+- dry-run — Preview a tool call: returns 402 challenge structure + price without payment. Use before paying. (0)
+- batch — Execute up to 10 tools in one payment (sum of prices). Pass calls: [{tool, input}]. Returns all results. (0)
