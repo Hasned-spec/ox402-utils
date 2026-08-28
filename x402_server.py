@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """ox402 seller v4: x402-paid agent tools (Base USDC). High-friction capabilities
-AI agents can't replicate with local compute. No free trial. All generative tools
-run on-CPU (espeak-ng, faster-whisper)."""
+AI agents can't replicate with local compute. Free trial: 5 calls/IP on tier=free tools; paid-tier tools always require payment."""
 import base64, json, os, re, time, urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
+import x402_security as SEC
 import x402_tools as T1
 import x402_tools2 as T2
 import x402_tools3 as T3
@@ -21,13 +21,16 @@ import x402_tools13 as T13
 import x402_tools14 as T14
 import x402_tools15 as T15
 import x402_tools16 as T16
+import x402_tools17 as T17
 
 PORT = int(os.environ.get('OX402_PORT', '8793'))
 NETWORK = 'eip155:8453'  # Base mainnet
-W = {'address': os.environ.get('OX402_PAYTO', '0x7869d1fe2d1de863b6fae4594d392343a69ed8e3')}
+W = {'address': os.environ.get('OX402_PAYTO', '0xE9C9cC258f7137fD0AbA4Ae513F0Cfa288c0cDc9')}
+# Self-hosted x402 facilitator (no CDP key needed): verifies + settles USDC on Base.
+FACILITATOR = os.environ.get('OX402_FACILITATOR', 'http://127.0.0.1:8090')
 
 # tool_name -> (function, price_usd, tier, description, sample)
-# tier 'free' = counts against the 5-call/IP trial; 'paid' = never free.
+# tier 'free' = first FREE_TRIAL_CALLS calls/IP are free; 'paid' = never free.
 TOOLS = {
     # ---- research & web intelligence ----
     'search':        (T4.tool_search, 0.008, 'free', 'Read-only web search (DuckDuckGo): title+url+snippet per result. Cost $0.008/call.', {'query':'x402 protocol','count':5}),
@@ -70,7 +73,7 @@ TOOLS = {
     'temp-webhook':  (T10.tool_temp_webhook, 0.005, 'free', 'Ephemeral public webhook URL (1h TTL): POST anything to it, then poll the same URL to read payloads. No server needed.', {'ttl_minutes':60}),
     'video2mp3':     (T10.tool_video2mp3, 0.004, 'free', 'Video/audio URL -> clean mono MP3 (48kbps, yt-dlp + ffmpeg, 1000+ platforms). Billed per started minute at $0.0004/min, reports minutes_billed. No file-size cap. Platform blocks may apply (YouTube/Vimeo need auth).', {'url':'https://example.com/podcast-ep.mp4','max_seconds':3600}),
     'image-optimize':(T10.tool_image_optimize, 0.01, 'free', 'Convert heic/png/jpeg -> webp/jpeg/png with compression + optional max_width resize. Reports saved %.', {'url':'https://x.com/photo.heic','format':'webp','quality':80}),
-    'image-compress':(T13.tool_image_compress, 0.002, 'free', 'Cheap image shrink: resize to a max dimension + quality, returns smaller base64. For trimming payloads before you send them on. Returns saved %.', {'image_base64':'<b64>','max_dimension':1280,'quality':75}),
+    'image-compress':(T13.tool_image_compress, 0.001, 'free', 'Cheap image shrink: resize to a max dimension + quality, returns smaller base64. For trimming payloads before you send them on. Returns saved %.', {'image_base64':'<b64>','max_dimension':1280,'quality':75}),
     'link-scan':     (T10.tool_link_scan, 0.01, 'free', 'URL safety scan: full redirect chain, tracking-param strip, urlhaus+openphish feeds, SSL validity, phishing-form heuristic, risk score.', {'url':'https://bit.ly/xyz'}),
     'file-scan':     (T10.tool_file_scan, 0.02, 'free', 'Static file analysis (nothing executed): sha256 vs MalwareBazaar, YARA rules, entropy, PDF active-content, PE imports/sections, archive entry listing. <=25MB.', {'file_base64':'<b64>','filename':'invoice.pdf'}),
 
@@ -133,28 +136,35 @@ TOOLS = {
     'link-health':    (T14.tool_link_health, 0.02, 'free', 'Crawl a page, report status of every outbound link (broken 4xx/5xx/timeout). Pre-publish link check.', {'url':'https://example.com'}),
 
     # ---- PREMIUM human-attractive tools (T16) ----
-    'ai-image':      (T16.tool_ai_image, 0.05, 'paid', 'AI image generation from a text prompt (Pollinations, no watermark). Useful for thumbnails, mockups, avatars. Returns PNG base64. $0.05/call.', {'prompt':'a serene mountain lake at sunset, digital art','width':1024,'height':1024}),
     'ai-text':       (T16.tool_ai_text, 0.03, 'paid', 'AI chatbot / text generation: ask anything, get a useful answer (free LLM). For humans who want a quick assistant without signing up. $0.03/call.', {'prompt':'Explain x402 in one sentence','system':'You are a helpful assistant.'}),
-    'ai-rewrite':    (T16.tool_ai_rewrite, 0.05, 'paid', 'AI rewriter / humanizer: makes text sound natural and human (kills AI-slop). Students, marketers, founders love this. $0.05/call.', {'text':'The implementation leverages synergistic paradigms to optimize outcomes.','style':'natural, human, fluent'}),
+    'ai-rewrite':    (T16.tool_ai_rewrite, 0.03, 'paid', 'AI rewriter / humanizer: makes text sound natural and human (kills AI-slop). Students, marketers, founders love this. $0.03/call.', {'text':'The implementation leverages synergistic paradigms to optimize outcomes.','style':'natural, human, fluent'}),
     'ai-summarize':  (T16.tool_ai_summarize, 0.03, 'paid', 'AI summarizer: turns long text into 3-5 bullet points. Articles, docs, meeting notes. $0.03/call.', {'text':'Paste a long article or report here...'}),
     'translate':     (T16.tool_translate, 0.03, 'paid', 'Translate text between 100+ languages (LibreTranslate / MyMemory). No API key. $0.03/call.', {'text':'Hello, how are you?','from':'en','to':'es'}),
-    'resume-parse':  (T16.tool_resume_parse, 0.05, 'paid', 'Resume / CV parser: PDF -> structured JSON (name, email, phone, skills). Job-seekers and recruiters. $0.05/call.', {'url':'https://example.com/resume.pdf'}),
+    'resume-parse':  (T16.tool_resume_parse, 0.03, 'paid', 'Resume / CV parser: PDF -> structured JSON (name, email, phone, skills). Job-seekers and recruiters. $0.03/call.', {'url':'https://example.com/resume.pdf'}),
     'pdf-to-word':   (T16.tool_pdf_to_word, 0.04, 'paid', 'Convert a PDF into an editable Word (.docx) file. $0.04/call.', {'url':'https://example.com/doc.pdf'}),
-    'plagiarism':    (T16.tool_plagiarism, 0.06, 'paid', 'Plagiarism / web-similarity check: estimates how much of your text already exists online. Students + writers. $0.06/call.', {'text':'Paste your essay or article here...'}),
-    'qr':            (T16.tool_qr, 0.002, 'paid', 'QR code generator: any text/url -> scannable PNG. $0.002/call.', {'data':'https://ox402.io'}),
+    'plagiarism':    (T16.tool_plagiarism, 0.04, 'paid', 'Plagiarism / web-similarity check: estimates how much of your text already exists online. Students + writers. $0.04/call.', {'text':'Paste your essay or article here...'}),
+    'qr':            (T16.tool_qr, 0.001, 'paid', 'QR code generator: any text/url -> scannable PNG. $0.001/call.', {'data':'https://ox402.io'}),
     'link-preview':  (T16.tool_link_preview, 0.01, 'paid', 'Link unfurl / preview card: Open Graph title+description+image for any URL (like a social embed). $0.01/call.', {'url':'https://github.com'}),
     'pdf-compress':  (T16.tool_pdf_compress, 0.03, 'paid', 'Shrink a PDF (re-pack pages, drop bloat). Email-friendly. $0.03/call.', {'url':'https://example.com/big.pdf'}),
     'video-thumb':   (T16.tool_video_thumb, 0.02, 'paid', 'Extract a thumbnail frame from any video URL at a given timestamp (ffmpeg). $0.02/call.', {'url':'https://example.com/clip.mp4','at':1}),
+
+    # ---- high-demand agent utilities (T17) ----
+    'openapi-fetch': (T17.tool_openapi_fetch, 0.008, 'free', 'Fetch + parse OpenAPI/Swagger spec from URL, return endpoint summary. Agent API discovery.', {'url':'https://api.example.com/openapi.json'}),
+    'graphql':       (T17.tool_graphql, 0.01, 'free', 'GraphQL introspection or query execution. Pass introspect=true for schema, or query+variables to run.', {'url':'https://api.example.com/graphql','introspect':True}),
+    'sqlite':        (T17.tool_sqlite, 0.01, 'free', 'In-memory SQLite sandbox: run SQL on CSV data you provide. Read-only by default; allow_write=true for DML.', {'sql':'SELECT * FROM users WHERE age > 25','csv_data':[{'table':'users','csv_text':'name,age\\nAda,36\\nAlan,41'}]}),
+    'embed':         (T17.tool_embed, 0.01, 'free', 'Local embeddings (BAAI/bge-small) + optional similarity search against provided docs. CPU, no API.', {'texts':['hello','world'],'docs':[{'id':1,'text':'greeting'}]}),
+    'price-estimate':(T17.tool_price_estimate, 0.0, 'free', 'Cost estimator: pass calls [{tool, count}] -> USD total + free-trial breakdown. No charge, helps agents budget.', {'calls':{'search':5,'pdf-extract':2}}),
+    'dry-run':       (T17.tool_dry_run, 0.0, 'free', 'Preview a tool call: returns 402 challenge structure + price without payment. Use before paying.', {'tool':'search'}),
+    'batch':         (T17.tool_batch, 0.0, 'paid', 'Execute up to 10 tools in one payment (sum of prices). Pass calls: [{tool, input}]. Returns all results.', {'calls':[{'tool':'search','input':{'query':'x402'}},{'tool':'whois','input':{'domain':'google.com'}}]}),
 }
 
 def price_for(tool):
     return f"{TOOLS[tool][1]:.3f}"
 
 def client_ip(headers, addr):
-    xff = headers.get('X-Forwarded-For') or ''
-    if xff:
-        return xff.split(',')[0].strip()
-    return addr[0]
+    # X-Forwarded-For is NOT trusted (spoofable by clients). Use socket peer
+    # (unspoofable) or X-Real-IP only when set by our own proxy (caddy/cloudflared).
+    return SEC.get_real_ip(headers, addr)
 
 def public_base_url(headers=None):
     """Canonical public HTTPS origin for payment resources + catalog links."""
@@ -181,7 +191,7 @@ def public_base_url(headers=None):
     return 'http://129.213.128.185'
 
 # ---- free trial ledger: N free calls per IP, persisted so it survives restarts ----
-FREE_TRIAL_CALLS = 5
+FREE_TRIAL_CALLS = 10
 _FREE_LEDGER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'free_trial.jsonl')
 
 def _load_free():
@@ -221,7 +231,7 @@ def verify_x402(headers, tool):
         return False, None, None, f'bad payment encoding: {e}'
     price = price_for(tool).lstrip('$')
     body = {'x402Version': payload.get('x402Version', 1), 'paymentHeader': hdr}
-    req = urllib.request.Request('https://api.cdp.coinbase.com/platform/v2/x402/verify',
+    req = urllib.request.Request(FACILITATOR + '/verify',
         data=json.dumps(body).encode(), method='POST',
         headers={'Content-Type': 'application/json'})
     try:
@@ -231,7 +241,7 @@ def verify_x402(headers, tool):
     if not res.get('isValid'):
         return False, None, None, 'payment invalid: ' + json.dumps(res.get('invalidReason'))
     def settle():
-        sreq = urllib.request.Request('https://api.cdp.coinbase.com/platform/v2/x402/settle',
+        sreq = urllib.request.Request(FACILITATOR + '/settle',
             data=json.dumps(body).encode(), method='POST',
             headers={'Content-Type': 'application/json'})
         return json.load(urllib.request.urlopen(sreq, timeout=20))
@@ -320,18 +330,49 @@ class H(BaseHTTPRequestHandler):
                     'payTo': W['address']},
                 'extensions': {'bazaar': bazaar}})
         if self.path.startswith('/.well-known'):
-            return self._send(200, {'name': 'ox402-utils', 'version': 4,
-                'description': 'Paid agent tools. x402 USDC on Base.',
-                'tools': [{'id': k, 'price': v[1], 'tier': v[2], 'desc': v[3]} for k, v in TOOLS.items()],
+            # 402index domain-verification endpoint: serve the raw verification hash
+            if self.path.endswith('/402index-verify.txt'):
+                try:
+                    import json as _j
+                    _claim = _j.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '.402index_claim.json')))
+                    _h = _claim.get('verification_hash', '')
+                except Exception:
+                    _h = ''
+                return self._send(200, _h.encode(), content_type='text/plain')
+            pub = public_base_url(self.headers)
+            tools_manifest = []
+            for k, v in TOOLS.items():
+                sample = v[4]
+                props = {pk: {'type': 'string', 'description': f'param {pk}'} for pk in sample.keys()}
+                tools_manifest.append({
+                    'id': k, 'price_usd': v[1], 'tier': v[2], 'desc': v[3],
+                    'input_schema': {'type': 'object', 'properties': props,
+                                     'required': list(sample.keys())},
+                    'example': sample,
+                })
+            return self._send(200, {
+                'schema_version': 'v1',
+                'name': 'ox402-utils',
+                'version': 4,
+                'description': '87 paid micro-utilities for AI agents and humans, payable per call via x402 (USDC on Base). Free trial: 10 calls/IP on tier=free tools via /x402/trial/<tool> (no wallet, no signup).',
+                'api': {'type': 'x402', 'url': f'{pub}/x402/paid', 'base_url': pub,
+                        'free_trial_url': f'{pub}/x402/trial', 'mcp': f'{pub}/mcp402/'},
+                'auth': {'type': 'x402', 'network': NETWORK, 'asset': 'USDC',
+                         'payTo': W['address'],
+                         'note': 'No API key. Each call returns a 402 with a payment requirement; pay via x402 and retry with the X-PAYMENT header.'},
+                'contact': {'email': 'oxalpha413596@emalupe.com'},
+                'legal': {'terms': f'{pub}/', 'privacy': f'{pub}/'},
+                'tools': tools_manifest,
+                'discovery': {'catalog': f'{pub}/x402/catalog', 'llms': f'{pub}/llms.txt'},
                 'rail': 'x402'})
-        if self.path.startswith('/catalog'):
+        if self.path.startswith('/x402/catalog') or self.path == '/catalog':
             return self._send(200, {'service': 'ox402-utils', 'version': 4,
                 'tool_count': len(TOOLS), 'network': NETWORK, 'asset': 'USDC',
                 'pay_to': W['address'],
                 'free_trial': {'calls_per_ip': FREE_TRIAL_CALLS, 'tier': 'free'},
                 'rate_limits': {'speech': '20 requests/min shared across stt/stt-fast/tts (all CPU)'},
                 'tools': {k: {'price': v[1], 'tier': v[2], 'desc': v[3], 'sample': v[4]} for k, v in TOOLS.items()},
-                'usage': 'POST /paid/<tool> JSON body; x402 402 handshake + X-PAYMENT header on every call'})
+                'usage': 'POST /paid/<tool> JSON body; x402 402 handshake + X-PAYMENT header on every call. POST /trial/<tool> for 10 free calls/IP on tier=free tools (no payment).'})
         return self._send(200, {'service': 'ox402-utils', 'version': 4,
             'tool_count': len(TOOLS), 'price_from': 0.001, 'network': NETWORK, 'asset': 'USDC',
             'pay_to': W['address'],
@@ -342,24 +383,30 @@ class H(BaseHTTPRequestHandler):
         m = re.match(r'^/hook/([\w-]{10,40})/?$', self.path)
         if m:
             return self._hook(m.group(1))
-        m = re.match(r'/paid/([a-z0-9-]+)', self.path)
-        tool = m.group(1) if m else None
-        if not tool or tool not in TOOLS:
-            t = self.path.split('/')[-1]
-            if self.path.startswith('/free/') and t in TOOLS:
-                return self._send(200, {'tool': t, 'price': TOOLS[t][1], 'sample': TOOLS[t][4]})
-            return self._send(404, {'error': 'unknown tool', 'hint': 'GET /catalog for the list'})
-        fn, price, tier, desc, sample = TOOLS[tool]
-        _ip = client_ip(self.headers, self.client_address)
-        ln = int(self.headers.get('Content-Length', 0) or 0)
-        try:
-            body = json.loads(self.rfile.read(ln) or b'{}')
-        except Exception:
-            return self._send(400, {'error': 'bad JSON body'})
-        body.pop('_free', None)  # never trust client-supplied flags
-
-        # --- free trial gate: tier 'free' tools get FREE_TRIAL_CALLS free calls per IP ---
-        if tier == 'free' and free_remaining(_ip) > 0:
+        # --- free trial endpoint: /trial/<tool> or /x402/trial/<tool> runs tier=free tools free ---
+        mt = re.match(r'/(x402/)?trial/([a-z0-9-]+)', self.path)
+        if mt:
+            tool = mt.group(2)
+            if tool not in TOOLS:
+                return self._send(404, {'error': 'unknown tool', 'hint': 'GET /catalog for the list'})
+            fn, price, tier, desc, sample = TOOLS[tool]
+            if tier != 'free':
+                return self._send(402, {'error': 'paid-tier tool — use /x402/paid/<tool> with x402 payment',
+                                        'note': 'Only tier=free tools are available on the trial endpoint.'})
+            _ip = client_ip(self.headers, self.client_address)
+            # Rate limit
+            ok_rl, retry = SEC.rate_limit(_ip, tool)
+            if not ok_rl:
+                return self._send(429, {'error': 'rate limit exceeded', 'retry_after_seconds': retry})
+            if free_remaining(_ip) <= 0:
+                return self._send(402, {'error': 'X402_PAYMENT_REQUIRED',
+                                        'note': f'Free trial exhausted for this IP ({FREE_TRIAL_CALLS} calls). Switch to /x402/paid/<tool> with an x402 USDC wallet.'})
+            ln = int(self.headers.get('Content-Length', 0) or 0)
+            try:
+                body = json.loads(self.rfile.read(ln) or b'{}')
+            except Exception:
+                return self._send(400, {'error': 'bad JSON body'})
+            body.pop('_free', None)
             consume_free(_ip)
             remaining = free_remaining(_ip)
             try:
@@ -374,7 +421,25 @@ class H(BaseHTTPRequestHandler):
                                     'amount_usd': 0.0, 'amount': 0.0, 'free': True}) + '\n')
             return self._send(200, {'result': out, 'payer': 'free-trial', 'settled': True,
                                     'free_trial': True, 'free_calls_remaining': remaining,
-                                    'note': f'Free trial call. {remaining} free calls left on this IP, then x402 USDC payment.'})
+                                    'note': f'Free trial call. {remaining} free calls left on this IP, then use /x402/paid/<tool> with x402 USDC.'})
+        m = re.match(r'/(x402/)?paid/([a-z0-9-]+)', self.path)
+        tool = m.group(2) if m else None
+        if not tool or tool not in TOOLS:
+            return self._send(404, {'error': 'unknown tool', 'hint': 'GET /catalog for the list'})
+        fn, price, tier, desc, sample = TOOLS[tool]
+        _ip = client_ip(self.headers, self.client_address)
+        # Rate limit (paid calls also cost us compute; protect the box)
+        ok_rl, retry = SEC.rate_limit(_ip, tool)
+        if not ok_rl:
+            return self._send(429, {'error': 'rate limit exceeded', 'retry_after_seconds': retry})
+        ln = int(self.headers.get('Content-Length', 0) or 0)
+        if ln > 8 * 1024 * 1024:  # 8MB hard cap on request body
+            return self._send(413, {'error': 'payload too large (8MB max)'})
+        try:
+            body = json.loads(self.rfile.read(ln) or b'{}')
+        except Exception:
+            return self._send(400, {'error': 'bad JSON body'})
+        body.pop('_free', None)  # never trust client-supplied flags
 
         ok, payer, settle, err = verify_x402(self.headers, tool)
         if not ok and err and err.startswith('missing'):
@@ -398,5 +463,6 @@ class H(BaseHTTPRequestHandler):
         self._send(200, {'result': out, 'payer': payer, 'settled': st.get('success')})
 
 if __name__ == '__main__':
+    SEC.install_ssrf_firewall()
     print(f"ox402 v4 on :{PORT} | tools={len(TOOLS)} | payTo={W['address']} | free trial: {FREE_TRIAL_CALLS} calls/IP on tier=free")
     ThreadingHTTPServer(('127.0.0.1', PORT), H).serve_forever()
