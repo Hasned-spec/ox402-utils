@@ -35,6 +35,9 @@ kokoro-onnx>=0.1.0
 fastembed>=0.3.0
 numpy>=1.24.0
 
+# Database
+sqlite3  # built-in
+
 # Crypto / Web3
 web3>=6.15.0
 eth-account>=0.10.0
