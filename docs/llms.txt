@@ -2,9 +2,9 @@
 
 94 paid tools for AI agents and humans. x402 USDC on Base.
 
-MCP: https://deviant-oils-guardian-coating.trycloudflare.com/mcp402/
-Catalog: https://deviant-oils-guardian-coating.trycloudflare.com/x402/catalog
-Discovery: https://deviant-oils-guardian-coating.trycloudflare.com/.well-known/x402
+MCP: http://129.213.128.185/mcp402/
+Catalog: http://129.213.128.185/x402/catalog
+Discovery: http://129.213.128.185/.well-known/x402
 
 ## Tools
 - search — Read-only web search (DuckDuckGo): title+url+snippet per result. Cost $0.008/call. (0.008)
