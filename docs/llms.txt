@@ -1,14 +1,14 @@
 # ox402
 
 94 paid tools for AI agents and humans, payable per call via x402 (USDC on Base).
-Base URL: https://cleveland-chancellor-cottage-necessity.trycloudflare.com
+Base URL: https://projection-well-lamps-unless.trycloudflare.com
 
 - Free trial: first 10 calls per IP on tier=free tools via POST /x402/trial/<tool> (no wallet, no signup).
 - Paid-tier tools: POST /x402/paid/<tool> with x402 USDC payment.
-- MCP server (streamable HTTP): https://cleveland-chancellor-cottage-necessity.trycloudflare.com/mcp402/
-- Catalog JSON: https://cleveland-chancellor-cottage-necessity.trycloudflare.com/x402/catalog
-- x402 discovery: https://cleveland-chancellor-cottage-necessity.trycloudflare.com/.well-known/x402
-- Free trial endpoint: https://cleveland-chancellor-cottage-necessity.trycloudflare.com/x402/trial/<tool>
+- MCP server (streamable HTTP): https://projection-well-lamps-unless.trycloudflare.com/mcp402/
+- Catalog JSON: https://projection-well-lamps-unless.trycloudflare.com/x402/catalog
+- x402 discovery: https://projection-well-lamps-unless.trycloudflare.com/.well-known/x402
+- Free trial endpoint: https://projection-well-lamps-unless.trycloudflare.com/x402/trial/<tool>
 
 ## Tools
 
