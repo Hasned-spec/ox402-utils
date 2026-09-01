@@ -1,14 +1,14 @@
 # ox402
 
 94 paid tools for AI agents and humans, payable per call via x402 (USDC on Base).
-
-MCP server (streamable HTTP, PRIMARY): http://129.213.128.185/mcp402/
-Base URL: http://129.213.128.185
+Base URL: https://cleveland-chancellor-cottage-necessity.trycloudflare.com
 
 - Free trial: first 10 calls per IP on tier=free tools via POST /x402/trial/<tool> (no wallet, no signup).
 - Paid-tier tools: POST /x402/paid/<tool> with x402 USDC payment.
-- Catalog JSON: http://129.213.128.185/x402/catalog
-- x402 discovery: http://129.213.128.185/.well-known/x402
+- MCP server (streamable HTTP): https://cleveland-chancellor-cottage-necessity.trycloudflare.com/mcp402/
+- Catalog JSON: https://cleveland-chancellor-cottage-necessity.trycloudflare.com/x402/catalog
+- x402 discovery: https://cleveland-chancellor-cottage-necessity.trycloudflare.com/.well-known/x402
+- Free trial endpoint: https://cleveland-chancellor-cottage-necessity.trycloudflare.com/x402/trial/<tool>
 
 ## Tools
 
